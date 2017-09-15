@@ -73,6 +73,8 @@ namespace Utilities
 
         public Location Floor() => new Location((int)X, (int)Y);
 
+        public Location Round() => new Location((int)(X + 0.5), (int)(Y + 0.5));
+
         public IntLocation Int() => new IntLocation((int)(X + 0.5), (int)(Y + 0.5));
 
         public void Read(NetworkReader R)

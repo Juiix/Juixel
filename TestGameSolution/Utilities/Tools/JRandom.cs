@@ -23,7 +23,7 @@ namespace Utilities.Tools
 
         public static double Next(double Max) => GetRandom().NextDouble() * Max;
 
-        public static double Next(int Min, int Max) => GetRandom().Next(Min, Max);
+        public static int Next(int Min, int Max) => GetRandom().Next(Min, Max);
 
         public static double Next(double Min, double Max) => Min + GetRandom().NextDouble() * (Max - Min);
     }

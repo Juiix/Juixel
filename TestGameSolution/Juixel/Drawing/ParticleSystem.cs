@@ -19,6 +19,8 @@ namespace Juixel.Drawing
 
         private bool _UseParentCoordinates;
 
+        protected virtual bool RemoveWhenEmpty => true;
+
         #endregion
 
         #region Init
@@ -103,7 +105,7 @@ namespace Juixel.Drawing
                 Particle.System = null;
                 Particle.Dispose();
 
-                if (Children.Count == 0)
+                if (Children.Count == 0 && RemoveWhenEmpty)
                     Dispose();
             }
         }

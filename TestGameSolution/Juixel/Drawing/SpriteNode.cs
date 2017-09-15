@@ -9,6 +9,7 @@ using Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using Utilities.Math;
 using Juixel.Extensions;
+using Utilities.Logging;
 
 namespace Juixel.Drawing
 {
@@ -44,6 +45,11 @@ namespace Juixel.Drawing
         public bool Reversed = false;
 
         /// <summary>
+        /// Determines if this Sprite will draw with a rounded position
+        /// </summary>
+        protected virtual bool SnapToPixel => true;
+
+        /// <summary>
         /// The size of this <see cref="SpriteNode"/> with scale applied.
         /// Setting this will change its <see cref="Node.Scale"/>
         /// </summary>
@@ -76,6 +82,7 @@ namespace Juixel.Drawing
         public override void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)
         {
             Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale) - new Location(0, Height * Scale.Y);
+            if (SnapToPixel) DrawPosition = DrawPosition.Round();
             Scale *= this.Scale;
             SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
                 new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);

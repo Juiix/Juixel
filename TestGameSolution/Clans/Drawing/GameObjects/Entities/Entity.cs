@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Logging;
 using Utilities.Tools;
 
 namespace Clans.Drawing.GameObjects.Entities
@@ -45,17 +46,23 @@ namespace Clans.Drawing.GameObjects.Entities
         protected virtual void SetDirection(Angle Angle)
         {
             Direction Old = FacingDirection;
-            int AngleValue = (int)(Angle + 45).Degrees;
-            FacingDirection = (Direction)(AngleValue / 90);
+            int AngleValue = (int)((Angle + 45).Degrees + 0.5);
+            FacingDirection = DirectionFromAngle(AngleValue);
 
-            if (Old != FacingDirection || !WasMoving && Moving)
+            if (Old != FacingDirection)
                 UpdateDirection();
+            else if (!WasMoving && Moving && Animation != null)
+            {
+                UpdateDirection();
+                Animation.Set(1, 0);
+            }
         }
 
         protected void UpdateDirection()
         {
             Sprite New = SpriteForDirection(FacingDirection, Moving);
             Sprite.Sprite = New;
+
             if (New is AnimatedSprite)
             {
                 AnimatedSprite NewAnimation = (AnimatedSprite)New;
@@ -65,6 +72,17 @@ namespace Clans.Drawing.GameObjects.Entities
                     NewAnimation.Reset();
                 Animation = NewAnimation;
             }
+        }
+
+        private Direction DirectionFromAngle(int Degrees)
+        {
+            if (Degrees <= 90 || Degrees == 360)
+                return Direction.Left;
+            else if (Degrees < 180)
+                return Direction.Down;
+            else if (Degrees <= 270)
+                return Direction.Right;
+            return Direction.Up;
         }
 
         protected virtual Sprite SpriteForDirection(Direction Direction, bool Moving)

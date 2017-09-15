@@ -1,4 +1,5 @@
 ﻿using Juixel.Drawing;
+using Juixel.Drawing.Assets;
 using Juixel.Drawing.Textures;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -101,6 +102,12 @@ namespace Juixel
             TextureLibrary.Setup(GraphicsDevice, Content);
             LoadFonts();
             DebugFont = Font.GetFont("");
+
+            Effects.TileBlendEffect = Content.Load<Effect>("Effects/TileBlend");
+
+            Masks.TileBlendMask = Content.Load<Texture2D>("Masks/TileBlendMask");
+
+            Effects.TileBlendEffect.Parameters["MaskTexture"].SetValue(Masks.TileBlendMask);
         }
 
         public virtual void LoadFonts()

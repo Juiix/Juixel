@@ -8,6 +8,7 @@ using Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Utilities.Math;
+using Juixel.Drawing.Assets;
 
 namespace Juixel.Drawing.Tiles
 {
@@ -70,15 +71,29 @@ namespace Juixel.Drawing.Tiles
             MaxX = Texture.Width / TileSize;
         }
 
-        public void Set(int X, int Y, int Index)
+        public void Set(int X, int Y, int Index, int BlendLayer)
         {
-            Tiles[X, Y] = new Tile((Index % MaxX) * TileSize, (Index / MaxX) * TileSize, TileSize);
+            Tile Tile = new Tile((Index % MaxX) * TileSize, (Index / MaxX) * TileSize, TileSize);
+            Tile.BlendLayer = BlendLayer;
+            Tiles[X, Y] = Tile;
+
+            for (int YAdd = -1; YAdd < 2; YAdd++)
+                for (int XAdd = -1; XAdd < 2; XAdd++)
+                {
+                    if (YAdd == 0 && XAdd == 0) continue;
+                    int XNew = X + XAdd;
+                    int YNew = Y + YAdd;
+                    if (XNew >= 0 && XNew < Width && YNew >= 0 && YNew < Height)
+                    {
+                        TileDirection Direction = PointToTileDirection(new IntLocation(XAdd + 1, YAdd + 1));
+                        Tile.CompareTo(Tiles[XNew, YNew], (int)Direction, (int)OppositeTileDirection(Direction));
+                    }
+                }
         }
 
         public override void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)
         {
             Location BaseLocation = Position + this.Position;
-            Angle BaseRotation = Rotation + this.Rotation;
             Location BaseScale = Scale * this.Scale;
             float BaseAlpha = Alpha * this.Alpha;
 
@@ -88,8 +103,48 @@ namespace Juixel.Drawing.Tiles
                     {
                         Tile Tile = Tiles[X, Y];
                         if (Tile != null)
-                            Tile.Draw(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseRotation, BaseScale, BaseAlpha);
+                            Tile.Draw(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseScale, BaseAlpha);
                     }
+
+            // Draw blend
+
+            SpriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, effect: Effects.TileBlendEffect);
+
+            for (int Y = Focus.Y - ViewRadius.Y; Y < Focus.Y + ViewRadius.Y; Y++)
+                for (int X = Focus.X - ViewRadius.X; X < Focus.X + ViewRadius.X; X++)
+                    if (X >= 0 && Y >= 0 && X < Width && Y < Height)
+                    {
+                        Tile Tile = Tiles[X, Y];
+                        if (Tile != null)
+                            Tile.DrawBlend(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseScale, BaseAlpha);
+                    }
+
+            SpriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
         }
+
+        public static IntLocation TileDirectionToPoint(TileDirection Direction)
+        {
+            int Value = (int)Direction;
+            return new IntLocation(Value % 3, Value / 3);
+        }
+
+        public static TileDirection PointToTileDirection(IntLocation Point) => (TileDirection)(Point.Y * 3 + Point.X);
+
+        public static TileDirection OppositeTileDirection(TileDirection Original) => (TileDirection)(8 - (int)Original);
+    }
+
+    public enum TileDirection : byte
+    {
+        TopLeft,
+        TopCenter,
+        TopRight,
+        MidLeft,
+        MidCenter,
+        MidRight,
+        BotLeft,
+        BotCenter,
+        BotRight
     }
 }

@@ -52,6 +52,7 @@
     <Compile Include="Drawing\GameObjects\Entities\Entity.cs" />
     <Compile Include="Drawing\GameObjects\Entities\Player.cs" />
     <Compile Include="Drawing\GameObjects\GameObject.cs" />
+    <Compile Include="Drawing\ParticleSystems\BloodEffect.cs" />
     <Compile Include="Drawing\ParticleSystems\SnowEffect.cs" />
     <Compile Include="Drawing\ParticleSystems\TestParticleSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

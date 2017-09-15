@@ -14,7 +14,7 @@ namespace Juixel.Drawing.Textures
     {
         #region Static
 
-        private static Font Default;
+        public static Font Default;
         private static Dictionary<string, Font> _Fonts = new Dictionary<string, Font>();
 
         public static void AddFont(string Name, Font Font)

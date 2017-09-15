@@ -18,7 +18,7 @@ namespace Juixel.Drawing
                 if (Target == null || Target.Scene == null)
                     return 0;
                 else
-                    return Target.Scene.Size / 2 - Target.SceneLocation;
+                    return (Target.Scene.Size / 2 - Target.SceneLocation).Round();
             }
         }
     }

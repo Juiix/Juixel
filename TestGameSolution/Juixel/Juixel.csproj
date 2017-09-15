@@ -51,7 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing\Assets\Masks.cs" />
     <Compile Include="Drawing\Camera\Camera.cs" />
+    <Compile Include="Drawing\Assets\Effects.cs" />
     <Compile Include="Drawing\LabelNode.cs" />
     <Compile Include="Drawing\Node.cs" />
     <Compile Include="Drawing\ParticleSystem.cs" />
