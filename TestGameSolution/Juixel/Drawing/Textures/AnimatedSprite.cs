@@ -14,6 +14,7 @@ namespace Juixel.Drawing.Textures
         public int CurrentIndex = 0;
         public double CurrentTime = 0;
 
+        public IntLocation Offset;
         private Frame[] _Sources;
 
         public AnimatedSprite(Texture2D Texture, params Frame[] Sources) : base(Texture, (Sources.Length > 0 ? Sources[0].Source : Texture.Bounds))
@@ -34,6 +35,7 @@ namespace Juixel.Drawing.Textures
 
             Frame CurrentFrame = _Sources[CurrentIndex];
             Source = CurrentFrame.Source;
+            Source.Offset(Offset.X, Offset.Y);
             AnchorPoint = CurrentFrame.AnchorPoint;
             Reverse = CurrentFrame.Reverse;
         }

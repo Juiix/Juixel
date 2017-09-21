@@ -1,21 +1,24 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Crypto;
 using Utilities.Logging;
+using Utilities.Threading;
 using static Utilities.Logging.Logger;
 
 namespace Utilities.Net
 {
-    public class NetworkConnection<TPacket>
+    public class NetworkConnection<TPacket> where TPacket : IPacket
     {
         #region Properties
 
-        private const int Send_Timeout = 4000;
-        private const int Receive_Timeout = 4000;
+        private const int Send_Timeout = 10_000;
+        private const int Receive_Timeout = 10_000;
 
         /// <summary>
         /// The base <see cref="Socket"/> of this connection
@@ -37,9 +40,21 @@ namespace Utilities.Net
         private NetworkBuffer _Buffer;
 
         /// <summary>
+        /// When this <see cref="NetworkConnection{TPacket}"/> last received bytes
+        /// </summary>
+        public DateTime LastReceived = DateTime.Now;
+
+        /// <summary>
         /// The type of Logging this object will do
         /// </summary>
         public virtual LogType LogType => LogType.Minimal;
+
+        /// <summary>
+        /// The <see cref="ProtocolType"/> that the base <see cref="Socket"/> uses
+        /// </summary>
+        public ProtocolType Protocol;
+
+        public EndPoint RemoteEndPoint => _Socket.RemoteEndPoint;
 
         #endregion
 
@@ -53,7 +68,24 @@ namespace Utilities.Net
         /// <param name="PacketSizeLength">The amount of <see langword="bytes"/> used to represent packet size</param>
         public NetworkConnection(SocketType Type, ProtocolType Protocol, int PacketSizeLength)
         {
+            this.Protocol = Protocol;
+
             _Socket = new Socket(Type, Protocol);
+
+            _Socket.SendTimeout = Send_Timeout;
+            _Socket.ReceiveTimeout = Receive_Timeout;
+
+            _Buffer = new NetworkBuffer(PacketSizeLength);
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="NetworkConnection{TPacket}"/> with an established socket
+        /// </summary>
+        /// <param name="Socket">The connected <see cref="Socket"/></param>
+        /// <param name="PacketSizeLength">The amount of <see langword="bytes"/> used to represent packet size</param>
+        public NetworkConnection(Socket Socket, int PacketSizeLength)
+        {
+            _Socket = Socket;
 
             _Socket.SendTimeout = Send_Timeout;
             _Socket.ReceiveTimeout = Receive_Timeout;
@@ -83,6 +115,19 @@ namespace Utilities.Net
             try
             {
                 _Socket.BeginConnect(Host, Port, ConnectCallback, Callback);
+            }
+            catch (Exception E) // Failed to connect
+            {
+                Logger.Log(E, true);
+                Callback(false);
+            }
+        }
+
+        public void Connect(EndPoint EndPoint, Action<bool> Callback)
+        {
+            try
+            {
+                _Socket.BeginConnect(EndPoint, ConnectCallback, Callback);
             }
             catch (Exception E) // Failed to connect
             {
@@ -129,6 +174,7 @@ namespace Utilities.Net
             {
                 int Read = _Socket.EndReceive(AR);
                 _Buffer.Position += (ushort)Read;
+                LastReceived = DateTime.Now;
 
                 if (Read <= 0)
                     Dispose();
@@ -143,7 +189,7 @@ namespace Utilities.Net
                 }
                 else
                 {
-                    OnReceivePacket(_Buffer.GetData());
+                    OnReceivePacket(_Buffer.GetData(), this);
                     _Buffer.Reset(BufferState.Size);
 
                     BeginReceive(_Buffer.Position, _Buffer.RemainingBytes);
@@ -160,27 +206,58 @@ namespace Utilities.Net
 
         #region Sending
 
+        private ConcurrentQueue<TPacket> _PacketsToSend = new ConcurrentQueue<TPacket>();
+        private bool _Sending = false;
 
+        public void Send(TPacket Packet)
+        {
+            if (_Sending)
+                _PacketsToSend.Enqueue(Packet);
+            else
+            {
+                _Sending = true;
+                SendBytes(Packet.GetData());
+            }
+        }
+
+        private void SendBytes(byte[] Bytes)
+        {
+            _Socket.BeginSend(Bytes, 0, Bytes.Length, SocketFlags.None, SendCallback, null);
+        }
+
+        private void SendCallback(IAsyncResult AR)
+        {
+            try
+            {
+                int SentBytes = _Socket.EndSend(AR);
+                _Sending = false;
+            }
+            catch (Exception E)
+            {
+                Log(E, true);
+                Dispose();
+            }
+        }
 
         #endregion
 
         #region Events
 
-        public event Action<byte[]> OnReceivePacket;
-        public event Action OnDisconnect;
+        public event Action<byte[], NetworkConnection<TPacket>> OnReceivePacket;
+        public event Action<NetworkConnection<TPacket>> OnDisconnect;
 
         #endregion
 
         #region Disposal
 
-        private void Dispose()
+        public void Dispose()
         {
             if (_Socket != null)
             {
                 _Socket.Dispose();
                 _Socket = null;
 
-                OnDisconnect();
+                OnDisconnect(this);
             }
         }
 

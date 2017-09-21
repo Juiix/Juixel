@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Utilities;
 using Microsoft.Xna.Framework.Graphics;
-using Utilities.Math;
+using Utilities.JMath;
 using Juixel.Extensions;
 using Utilities.Logging;
 
@@ -81,12 +81,17 @@ namespace Juixel.Drawing
 
         public override void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)
         {
-            Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale) - new Location(0, Height * Scale.Y);
-            if (SnapToPixel) DrawPosition = DrawPosition.Round();
-            Scale *= this.Scale;
-            SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
-                new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
-            base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
+            if (!Hidden)
+            {
+                Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale) - new Location(0, Height * Scale.Y);
+                if (SnapToPixel) DrawPosition = DrawPosition.Round();
+                Location Size = this.Size * Scale;
+                Scale *= this.Scale;
+                if (DrawPosition.X + Size.X >= 0 && DrawPosition.Y + Size.X >= 0 && DrawPosition.X - Size.X < JuixelGame.WindowWidth && DrawPosition.Y - Size.X < JuixelGame.WindowHeight)
+                    SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
+                        new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+                base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
+            }
         }
 
         #endregion

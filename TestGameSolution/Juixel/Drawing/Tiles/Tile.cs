@@ -8,13 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
-using Utilities.Math;
+using Utilities.JMath;
 using Utilities.Tools;
 
 namespace Juixel.Drawing.Tiles
 {
     public class Tile
     {
+        private const int Max_Weather_Value = 5;
+
         /// <summary>
         /// The <see cref="Rectangle"/> source of the tile sprite within the sheet
         /// </summary>
@@ -28,16 +30,22 @@ namespace Juixel.Drawing.Tiles
         /// <summary>
         /// The index of the tile blend mask to use
         /// </summary>
-        private int MaskIndex = JRandom.Next(2);
+        private int MaskIndex = JRandom.Next(3);
+
+        public int WeatherIntensity;
 
         /// <summary>
         /// Used to determine when this tile will draw blend
         /// </summary>
         public int BlendLayer = 0;
 
-        public Tile(int TexX, int TexY, int Size)
+        public ushort Type;
+
+        public Tile(int TexX, int TexY, int Size, ushort Type, int WeatherIntensity)
         {
             Source = new Rectangle(TexX, TexY, Size, Size);
+            this.Type = Type;
+            this.WeatherIntensity = WeatherIntensity;
         }
 
         public void Draw(Texture2D Texture, JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Location Scale, float Alpha)

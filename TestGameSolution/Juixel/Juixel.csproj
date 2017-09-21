@@ -51,6 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing\Animation\AnimationGroup.cs" />
+    <Compile Include="Drawing\Animation\Definitions.Animation.cs" />
     <Compile Include="Drawing\Assets\Masks.cs" />
     <Compile Include="Drawing\Camera\Camera.cs" />
     <Compile Include="Drawing\Assets\Effects.cs" />

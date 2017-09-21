@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Utilities.Math;
+using Utilities.JMath;
 using Utilities.Net;
 using Utilities.Net.Tools;
 using Utilities.Tools;
@@ -75,7 +75,9 @@ namespace Utilities
 
         public Location Round() => new Location((int)(X + 0.5), (int)(Y + 0.5));
 
-        public IntLocation Int() => new IntLocation((int)(X + 0.5), (int)(Y + 0.5));
+        public IntLocation Int => new IntLocation((int)(X + 0.5), (int)(Y + 0.5));
+
+        public IntLocation IntFloor => new IntLocation((int)X, (int)Y);
 
         public void Read(NetworkReader R)
         {
@@ -135,9 +137,11 @@ namespace Utilities
 
         public static IntLocation Zero = new IntLocation();
         public static IntLocation One = new IntLocation(1);
+
+        public override string ToString() => $"{{{X}, {Y}}}";
     }
 
-    public struct Angle
+    public struct Angle: IReadable, IWritable
     {
         private double _Radians;
         public double Radians
@@ -175,6 +179,11 @@ namespace Utilities
         }
 
         public Location Location => new Location(System.Math.Cos(Radians), System.Math.Sin(Radians));
+        public double Difference(Angle Other)
+        {
+            double A = Other.Radians - Radians;
+            return Math.Abs(Functions.Mod((A + System.Math.PI * 2), System.Math.PI * 2) - System.Math.PI);
+        }
 
         public static Angle Random => new Angle(System.Math.PI * 2 * JRandom.NextDouble());
         public static double ToRadians(double Degrees) => Degrees * System.Math.PI / 180.0;
@@ -182,6 +191,16 @@ namespace Utilities
         public static double Normalize(double Radians)
         {
             return Functions.Mod(Radians, System.Math.PI * 2);
+        }
+
+        public void Write(NetworkWriter W)
+        {
+            W.Write(Radians);
+        }
+
+        public void Read(NetworkReader R)
+        {
+            Radians = R.ReadDouble();
         }
 
         public static Angle operator +(Angle Left, Angle Right) => Left.Add(Right.Radians, true);

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
-using Utilities.Math;
+using Utilities.JMath;
 
 namespace Juixel.Drawing
 {
@@ -62,9 +62,10 @@ namespace Juixel.Drawing
         {
             SortChildren();
 
+            Scale *= this.Scale;
             if (!_UseParentCoordinates)
                 for (int i = 0; i < Children.Count; i++)
-                    Children[i].Draw(Time, SpriteBatch, Position + this.Position, Rotation + this.Rotation, Scale * this.Scale, Alpha * this.Alpha);
+                    Children[i].Draw(Time, SpriteBatch, Position + this.Position * Scale, Rotation + this.Rotation, Scale, Alpha * this.Alpha);
         }
 
         protected override void SortChildren()
@@ -171,6 +172,8 @@ namespace Juixel.Drawing
         /// </summary>
         public ParticleSystem System;
 
+        protected Vector2 Origin = new Vector2(0.5f);
+
         /// <summary>
         /// Initializes this <see cref="Particle"/> with a <see cref="Sprite"/>
         /// </summary>
@@ -195,8 +198,8 @@ namespace Juixel.Drawing
         {
             Location DrawPosition = Position + this.Position * Scale - new Location(0, Height * Scale.Y);
             Scale *= this.Scale;
-            SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
-                new Vector2(Sprite.Source.Width * 0.5f, Sprite.Source.Height * 0.5f), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            SpriteBatch.Draw(Sprite.Texture, DrawPosition.Round().ToVector2(), Sprite.Source, Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
+                new Vector2(Sprite.Source.Width * Origin.X, Sprite.Source.Height * Origin.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
             base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
         }
 

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Utilities;
 using MonoGame.Extended.BitmapFonts;
 using Juixel.Extensions;
-using Utilities.Math;
+using Utilities.JMath;
 using Microsoft.Xna.Framework;
 using Juixel.Drawing.Textures;
 

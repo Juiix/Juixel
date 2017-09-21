@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using Utilities.Math;
+using Utilities.JMath;
 using Juixel.Drawing.Assets;
 
 namespace Juixel.Drawing.Tiles
@@ -71,9 +71,9 @@ namespace Juixel.Drawing.Tiles
             MaxX = Texture.Width / TileSize;
         }
 
-        public void Set(int X, int Y, int Index, int BlendLayer)
+        public void Set(int X, int Y, int Index, int BlendLayer, ushort Type, int WeatherIntensity)
         {
-            Tile Tile = new Tile((Index % MaxX) * TileSize, (Index / MaxX) * TileSize, TileSize);
+            Tile Tile = new Tile((Index % MaxX) * TileSize, (Index / MaxX) * TileSize, TileSize, Type, WeatherIntensity);
             Tile.BlendLayer = BlendLayer;
             Tiles[X, Y] = Tile;
 
@@ -89,6 +89,13 @@ namespace Juixel.Drawing.Tiles
                         Tile.CompareTo(Tiles[XNew, YNew], (int)Direction, (int)OppositeTileDirection(Direction));
                     }
                 }
+        }
+
+        public Tile Get(int X, int Y)
+        {
+            if (X >= 0 && X < Width && Y >= 0 && Y < Height)
+                return Tiles[X, Y];
+            return null;
         }
 
         public override void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)

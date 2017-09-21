@@ -111,12 +111,16 @@ namespace Juixel.Input
 
         #endregion
 
+        #region Mouse
+
         private static MouseState _LastMouseState;
 
         private static LockingList<IMouseHandler> _MouseHandlers
             = new LockingList<IMouseHandler>();
 
-        #region Mouse
+        public static int MouseX => _LastMouseState.Position.X;
+
+        public static int MouseY => _LastMouseState.Position.Y;
 
         public static void ListenForMouse(IMouseHandler Handler)
         {

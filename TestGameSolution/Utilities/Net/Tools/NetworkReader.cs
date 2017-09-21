@@ -85,6 +85,12 @@ namespace Utilities.Net.Tools
             return Array;
         }
 
+        public string ReadUTF32() => Encoding.UTF8.GetString(ReadBytes32());
+
+        public string ReadUTF16() => Encoding.UTF8.GetString(ReadBytes16());
+
+        public string ReadUTF8() => Encoding.UTF8.GetString(ReadBytes8());
+
         #endregion
 
     }

@@ -64,6 +64,10 @@
       <Project>{a0fd446c-4455-49b0-871b-bb35b575ed85}</Project>
       <Name>Juixel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestGameUtilities\TestGameUtilities.csproj">
+      <Project>{6feb8dca-e854-4fbf-ae09-fddcee040fe1}</Project>
+      <Name>TestGameUtilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utilities\Utilities.csproj">
       <Project>{11c85470-e0e8-4b3f-8b76-8b1ed320bae2}</Project>
       <Name>Utilities</Name>

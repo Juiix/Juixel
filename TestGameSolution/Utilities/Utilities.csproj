@@ -50,10 +50,13 @@
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Math\Functions.cs" />
     <Compile Include="Math\Geometry.cs" />
+    <Compile Include="Math\Noise.cs" />
     <Compile Include="Math\Structures.cs" />
     <Compile Include="Net\Interfaces.cs" />
     <Compile Include="Net\NetworkConnection.cs" />
+    <Compile Include="Net\NetworkListener.cs" />
     <Compile Include="Net\Packet.cs" />
+    <Compile Include="Net\PacketHandler.cs" />
     <Compile Include="Net\Tools\NetworkReader.cs" />
     <Compile Include="Net\Tools\NetworkWriter.cs" />
     <Compile Include="Pooling\ObjectPool.cs" />

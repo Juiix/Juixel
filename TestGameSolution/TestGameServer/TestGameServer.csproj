@@ -43,12 +43,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Networking\Clients\ClientManager.cs" />
+    <Compile Include="Networking\Clients\Client.cs" />
+    <Compile Include="Networking\Clients\GMPacketHandler.cs" />
+    <Compile Include="Networking\Clients\Handlers\GMHelloPacketHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Worlds\WorldManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TestGameUtilities\TestGameUtilities.csproj">
+      <Project>{6feb8dca-e854-4fbf-ae09-fddcee040fe1}</Project>
+      <Name>TestGameUtilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{11c85470-e0e8-4b3f-8b76-8b1ed320bae2}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

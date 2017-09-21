@@ -148,6 +148,24 @@ namespace Utilities.Net.Tools
                 Write(Values[i]);
         }
 
+        public void WriteUTF32(string Value)
+        {
+            Write(Value.Length);
+            _InnerWriter.Write(Encoding.UTF8.GetBytes(Value));
+        }
+
+        public void WriteUTF16(string Value)
+        {
+            Write((short)Value.Length);
+            _InnerWriter.Write(Encoding.UTF8.GetBytes(Value));
+        }
+
+        public void WriteUTF8(string Value)
+        {
+            Write((byte)Value.Length);
+            _InnerWriter.Write(Encoding.UTF8.GetBytes(Value));
+        }
+
         #endregion
     }
 }

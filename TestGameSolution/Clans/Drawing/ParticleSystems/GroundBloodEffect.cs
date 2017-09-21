@@ -12,7 +12,7 @@ using Utilities.Tools;
 
 namespace Clans.Drawing.ParticleSystems
 {
-    public class BloodEffect : ParticleSystem
+    public class GroundBloodEffect : ParticleSystem
     {
         protected override bool RemoveWhenEmpty => false;
 
@@ -46,7 +46,7 @@ namespace Clans.Drawing.ParticleSystems
 
         private double PixelScale;
 
-        public BloodEffect(Node Follow, int SpawnRadius, double PixelScale) : base(true)
+        public GroundBloodEffect(Node Follow, int SpawnRadius, double PixelScale) : base(true)
         {
             this.Follow = Follow;
             this.SpawnRadius = SpawnRadius;
@@ -61,8 +61,8 @@ namespace Clans.Drawing.ParticleSystems
 
             if (DropsPerSecond < 0)
                 DropsPerSecond = 0;
-            if (DropsPerSecond > 4000)
-                DropsPerSecond = 4000;
+            if (DropsPerSecond > 800)
+                DropsPerSecond = 800;
 
             SpawnCD -= Time.ElapsedSec;
             while (SpawnCD <= 0)
@@ -74,7 +74,7 @@ namespace Clans.Drawing.ParticleSystems
 
         private void AddBloodParticle()
         {
-            var Blood = new BloodParticle(new IntLocation((int)(-SpawnRadius * PixelScale) + (int)(SpawnRadius * 2 * PixelScale * JRandom.NextDouble()), (int)(-SpawnRadius * PixelScale) + (int)(SpawnRadius * 2 * PixelScale * JRandom.NextDouble())))
+            var Blood = new BloodParticle((Angle.Random.Location * JRandom.NextDouble() * SpawnRadius * PixelScale + PixelScale).Int)
             {
                 Scale = PixelScale
             };

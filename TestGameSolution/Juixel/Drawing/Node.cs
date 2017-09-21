@@ -102,6 +102,11 @@ namespace Juixel.Drawing
         public float Alpha = 1;
 
         /// <summary>
+        /// Determines if this <see cref="Node"/> is drawn
+        /// </summary>
+        public bool Hidden = false;
+
+        /// <summary>
         /// The color shift of this <see cref="Node"/>
         /// </summary>
         public Color Color = Color.White;
@@ -140,10 +145,21 @@ namespace Juixel.Drawing
             get => _Layer;
             set
             {
-                bool Resort = _Layer != value;
+                bool ReSort = _Layer != value;
                 _Layer = value;
-                if (Resort && Parent != null)
+                if (ReSort && Parent != null)
                     Parent.ChildrenNeedSort = true;
+            }
+        }
+
+        public virtual int NodeCount
+        {
+            get
+            {
+                int Count = Children.Count;
+                for (int i = 0; i < Children.Count; i++)
+                    Count += Children[i].NodeCount;
+                return Count;
             }
         }
 
@@ -290,14 +306,17 @@ namespace Juixel.Drawing
 
         public virtual void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)
         {
-            if (ChildrenNeedSort)
+            if (!Hidden)
             {
-                SortChildren();
-                ChildrenNeedSort = false;
-            }
+                if (ChildrenNeedSort)
+                {
+                    SortChildren();
+                    ChildrenNeedSort = false;
+                }
 
-            for (int i = 0; i < Children.Count; i++)
-                Children[i].Draw(Time, SpriteBatch, Position + this.Position, Rotation + this.Rotation, Scale * this.Scale, Alpha * this.Alpha);
+                for (int i = 0; i < Children.Count; i++)
+                    Children[i].Draw(Time, SpriteBatch, Position + this.Position, Rotation + this.Rotation, Scale * this.Scale, Alpha * this.Alpha);
+            }
         }
 
         #endregion

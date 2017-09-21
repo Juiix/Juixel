@@ -1,4 +1,5 @@
 ﻿using Juixel;
+using Juixel.Drawing.Animation;
 using Juixel.Drawing.Textures;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using Utilities;
 using Utilities.Logging;
 using Utilities.Tools;
 
-namespace Clans.Drawing.GameObjects.Entities
+namespace Clans.Drawing.GameObjects
 {
     public class Entity : GameObject
     {
@@ -25,6 +26,8 @@ namespace Clans.Drawing.GameObjects.Entities
         protected bool Attacking = false;
         protected bool WasAttacking = false;
 
+        protected AnimationGroup Animations;
+
         #endregion
 
         #region Init
@@ -34,9 +37,14 @@ namespace Clans.Drawing.GameObjects.Entities
             SetupAnimation();
         }
 
-        protected virtual void SetupAnimation()
+        protected void SetupAnimation()
         {
+            Animations = new AnimationGroup(AnimationFor);
+        }
 
+        protected virtual AnimatedSprite AnimationFor(AnimationStatus Status)
+        {
+            return null;
         }
 
         #endregion
@@ -58,9 +66,10 @@ namespace Clans.Drawing.GameObjects.Entities
             }
         }
 
-        protected void UpdateDirection()
+        protected virtual void UpdateDirection()
         {
-            Sprite New = SpriteForDirection(FacingDirection, Moving);
+            int DirectionInt = (int)FacingDirection;
+            Sprite New = SpriteForStatus((AnimationStatus)(Attacking ? 8 + DirectionInt : (Moving ? 4 + DirectionInt : DirectionInt)));
             Sprite.Sprite = New;
 
             if (New is AnimatedSprite)
@@ -77,17 +86,17 @@ namespace Clans.Drawing.GameObjects.Entities
         private Direction DirectionFromAngle(int Degrees)
         {
             if (Degrees <= 90 || Degrees == 360)
-                return Direction.Left;
+                return Direction.Right;
             else if (Degrees < 180)
                 return Direction.Down;
             else if (Degrees <= 270)
-                return Direction.Right;
+                return Direction.Left;
             return Direction.Up;
         }
 
-        protected virtual Sprite SpriteForDirection(Direction Direction, bool Moving)
+        protected virtual Sprite SpriteForStatus(AnimationStatus Status)
         {
-            return null;
+            return Animations.Animation(Status);
         }
 
         protected override void OnPositionWillChange(Location To)
@@ -102,11 +111,6 @@ namespace Clans.Drawing.GameObjects.Entities
 
         public override void Update(JuixelTime Time)
         {
-            base.Update(Time);
-
-            if (Animation != null)
-                Animation.Update(Time, FrameRate, out Sprite.Reversed, out Sprite.AnchorPoint);
-
             if (Moving)
             {
                 Moving = false;
@@ -117,6 +121,8 @@ namespace Clans.Drawing.GameObjects.Entities
                 WasMoving = false;
                 UpdateDirection();
             }
+
+            base.Update(Time);
         }
 
         #endregion

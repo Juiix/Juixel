@@ -58,7 +58,8 @@ namespace Clans.Drawing.GameObjects
 
         public virtual void Update(JuixelTime Time)
         {
-
+            if (Animation != null)
+                Animation.Update(Time, FrameRate, out Sprite.Reversed, out Sprite.AnchorPoint);
         }
     }
 }

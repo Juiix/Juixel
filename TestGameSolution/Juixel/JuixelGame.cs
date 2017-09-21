@@ -37,6 +37,8 @@ namespace Juixel
         /// </summary>
         public static int WindowHeight = 0;
 
+        public static JuixelGame Shared;
+
         #endregion
 
         #region Properties
@@ -78,12 +80,12 @@ namespace Juixel
         /// <summary>
         /// The tint <see cref="Color"/> of the screen
         /// </summary>
-        public Color TintColor = Color.White;
+        public static Color TintColor = Color.White;
 
         /// <summary>
         /// The intensity of the <see cref="TintColor"/>. 1.0 will block the screen with the color
         /// </summary>
-        public float TintIntensity = 0;
+        public static float TintIntensity = 0;
 
         /// <summary>
         /// The current <see cref="Scene"/> being presented
@@ -108,6 +110,8 @@ namespace Juixel
             Masks.TileBlendMask = Content.Load<Texture2D>("Masks/TileBlendMask");
 
             Effects.TileBlendEffect.Parameters["MaskTexture"].SetValue(Masks.TileBlendMask);
+
+            CurrentScene = MakeFirstScene();
         }
 
         public virtual void LoadFonts()
@@ -142,6 +146,13 @@ namespace Juixel
             Graphics.PreferMultiSampling = false;
 
             Logger.SaveLogs = false;
+
+            Shared = this;
+        }
+
+        protected virtual Scene MakeFirstScene()
+        {
+            return null;
         }
 
         #endregion

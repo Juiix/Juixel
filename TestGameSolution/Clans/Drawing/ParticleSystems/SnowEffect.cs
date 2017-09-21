@@ -26,6 +26,8 @@ namespace Clans.Drawing.ParticleSystems
             get => _Intensity;
             set
             {
+                if (value > 0 || _Intensity != 0)
+                    Enabled = true;
                 _Intensity = value;
                 double CD = 1 / (Math.Pow(Intensity, 2) * 20);
                 if (SpawnCD > CD)
@@ -38,7 +40,9 @@ namespace Clans.Drawing.ParticleSystems
         /// </summary>
         public double SpawnCD = 0;
 
-        private TintParticle Tint;
+        private Color TintColor = new Color(198, 215, 226);
+
+        private bool Enabled = true;
 
         public SnowEffect(double Intensity) : base(false)
         {
@@ -53,18 +57,19 @@ namespace Clans.Drawing.ParticleSystems
 
         public override void Update(JuixelTime Time)
         {
-            if (Tint == null)
-            {
-                Tint = new TintParticle(new Color(198, 215, 226));
-                AddParticle(Tint);
-            }
-
             base.Update(Time);
 
             if (Intensity < 0)
                 Intensity = 0;
 
-            Tint.Alpha = 0.1f + (float)(Math.Log10(Intensity) / Math.E) * 0.9f;
+            if (Enabled)
+            {
+                JuixelGame.TintColor = TintColor;
+                JuixelGame.TintIntensity = 0.1f + (float)(Math.Log10(Intensity) / Math.E) * 0.9f;
+
+                if (_Intensity == 0)
+                    Enabled = false;
+            }
 
             SpawnCD -= Time.ElapsedSec;
             while (SpawnCD <= 0)
@@ -79,7 +84,7 @@ namespace Clans.Drawing.ParticleSystems
         private void AddSnowParticle()
         {
             Sprite Sprite = Sprites[JRandom.Next(Sprites.Length)];
-            double Speed = 2 * Intensity * JRandom.Next(0.7, 1.3);
+            double Speed = 120 * Intensity * JRandom.Next(0.7, 1.3);
             AddParticle(new SnowParticle(new Angle((Math.PI / 2) * JRandom.NextDouble() + Math.PI / 4).Location * Speed, new Location(JRandom.Next(JuixelGame.WindowWidth), -Sprite.Source.Height),
                 1 + Math.Log10(Intensity / Math.E), JuixelGame.WindowHeight + Sprite.Source.Height, Sprite));
         }
@@ -116,7 +121,7 @@ namespace Clans.Drawing.ParticleSystems
             public override Location Update(JuixelTime Time, Location CurrentLocal, out bool Stop)
             {
                 Stop = Position.Y > MaxY;
-                return Speed;
+                return Speed * Time.ElapsedSec;
             }
         }
 
