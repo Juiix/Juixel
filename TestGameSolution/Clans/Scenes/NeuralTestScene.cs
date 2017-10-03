@@ -8,7 +8,7 @@ using Utilities;
 using Juixel;
 using Neural;
 using Juixel.Drawing.Textures;
-using Juixel.Input;
+using Juixel.Interaction;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using Utilities.Logging;

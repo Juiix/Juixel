@@ -44,10 +44,16 @@
     <Compile Include="Definitions\Net\Client\Definitions.Client.cs" />
     <Compile Include="Definitions\Net\Client\FromClient\GMHelloPacket.cs" />
     <Compile Include="Definitions\Net\Client\FromClient\GMMovePacket.cs" />
+    <Compile Include="Definitions\Net\Client\FromClient\GMPongPacket.cs" />
     <Compile Include="Definitions\Net\Client\FromClient\GMShootPacket.cs" />
     <Compile Include="Definitions\Net\Client\GMPacket.cs" />
+    <Compile Include="Definitions\Net\Client\ToClient\GMConnectPacket.cs" />
+    <Compile Include="Definitions\Net\Client\ToClient\GMDisconnectPacket.cs" />
+    <Compile Include="Definitions\Net\Client\ToClient\GMPingPacket.cs" />
     <Compile Include="Definitions\Net\Client\ToClient\GMTickPacket.cs" />
     <Compile Include="Definitions\Net\Client\ToClient\GMUpdatePacket.cs" />
+    <Compile Include="Definitions\Net\Ports.cs" />
+    <Compile Include="Definitions\Net\UDPClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

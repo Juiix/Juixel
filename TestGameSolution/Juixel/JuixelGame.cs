@@ -1,6 +1,8 @@
 ﻿using Juixel.Drawing;
 using Juixel.Drawing.Assets;
 using Juixel.Drawing.Textures;
+using Juixel.Interaction;
+using Juixel.Tools;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -39,6 +41,8 @@ namespace Juixel
 
         public static JuixelGame Shared;
 
+        public static bool Desktop => DeviceType.Desktop.HasFlag(DeviceType);
+
         #endregion
 
         #region Properties
@@ -47,6 +51,8 @@ namespace Juixel
         /// The main Game of Monogame
         /// </summary>
         private Game _Game;
+
+        public bool Active => _Game.IsActive;
 
         public SpriteBatch SpriteBatch;
         public GraphicsDeviceManager Graphics;
@@ -181,6 +187,12 @@ namespace Juixel
                 CurrentScene.Size = new Location(WindowWidth, WindowHeight);
         }
 
+        public void ChangeScene(Scene To)
+        {
+            CurrentScene.Dispose();
+            CurrentScene = To;
+        }
+
         private JuixelTime Time = new JuixelTime();
 
         public virtual void Update(GameTime Time)
@@ -188,7 +200,8 @@ namespace Juixel
 #if DEBUG
             Logger.StepLog();
 #endif
-            Input.Input.StepInput();
+            Input.StepInput();
+            DispatchQueue.Main.Step();
 
             double ElapsedMS = Time.ElapsedGameTime.TotalMilliseconds;
             this.Time.ElapsedMS = ElapsedMS;
@@ -225,10 +238,11 @@ namespace Juixel
                     DebugTextTime -= this.Time.ElapsedSec;
                     Text += " D: " + DebugText;
                 }
-                Vector2 Size = DebugFont.BaseFont.MeasureString(Text);
+                FontInfo Info = DebugFont.GetSized(0);
+                Vector2 Size = Info.BMFont.MeasureString(Text);
 
                 SpriteBatch.Draw(TextureLibrary.Square, new Rectangle(0, 0, (int)Size.X + 8, (int)Size.Y), Color.Black * 0.5f);
-                SpriteBatch.DrawString(DebugFont.BaseFont, Text, new Vector2(4, 0), Color.White);
+                SpriteBatch.DrawString(Info.BMFont, Text, new Vector2(4, 0), Color.White);
             }
 
             SpriteBatch.End();

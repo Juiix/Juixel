@@ -21,6 +21,8 @@ namespace Juixel.Drawing
 
         protected virtual bool RemoveWhenEmpty => true;
 
+        protected override bool Updates => true;
+
         #endregion
 
         #region Init
@@ -35,8 +37,10 @@ namespace Juixel.Drawing
 
         }
 
-        public virtual void Update(JuixelTime Time)
+        public override void Update(JuixelTime Time)
         {
+            base.Update(Time);
+
             for (int i = 0; i < Children.Count; i++)
             {
                 Particle Particle = (Particle)Children[i];
@@ -127,18 +131,6 @@ namespace Juixel.Drawing
                 for (int i = 0; i < Children.Count; i++)
                     Children[i].RemoveFromParent();
             }
-        }
-
-        protected override void OnAddScene()
-        {
-            base.OnAddScene();
-            Scene.AddUpdatable(this);
-        }
-
-        protected override void OnRemoveScene(Scene RemovedScene)
-        {
-            base.OnRemoveScene(RemovedScene);
-            RemovedScene.AddUpdatable(this);
         }
 
         #endregion

@@ -1,89 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using TestGameUtilities.Definitions.Net;
 using TestGameUtilities.Definitions.Net.Client;
 using Utilities.Logging;
-using Utilities.Net;
 
 namespace TestGameServer.Networking.Clients
 {
-    /// <summary>
-    /// Used to communicate with a connected player client
-    /// </summary>
     public class Client
     {
-        /// <summary>
-        /// The <see cref="NetworkConnection{TPacket}"/> used to send TCP packets to the client
-        /// </summary>
-        private NetworkConnection<GMPacket> ConnectionTCP;
-
-        /// <summary>
-        /// The <see cref="NetworkConnection{TPacket}"/> used to send UDP packets to the client
-        /// </summary>
-        private NetworkConnection<GMPacket> ConnectionUDP;
-
-        /// <summary>
-        /// The <see cref="ClientManager"/> that contains this <see cref="Client"/>
-        /// </summary>
         public ClientManager Manager;
+        public string Username;
+
+        private UDPClient _UDP;
+        private int _Port;
 
         #region Init
 
-        public Client()
+        public Client(string Username, EndPoint EndPoint, int Port)
         {
+            this.Username = Username;
 
-        }
-
-        public void AddTCPConnection(NetworkConnection<GMPacket> Connection, Action<bool> SuccessCallback)
-        {
-            if (ConnectionTCP != null)
-                throw new InvalidOperationException("This Client already has a TCP connection established!");
-            ConnectionTCP = Connection;
-            ConnectionTCP.OnReceivePacket += ReceivedPacket;
-
-            ConnectionUDP = new NetworkConnection<GMPacket>(SocketType.Dgram, ProtocolType.Udp, 2);
-            ConnectionUDP.Connect(Connection.RemoteEndPoint, SuccessCallback);
+            _Port = Port;
+            _UDP = new UDPClient(EndPoint, Port);
+            _UDP.OnReceivedPacket = OnReceivePacket;
+            _UDP.OnDisconnect = OnDisconnect;
         }
 
         #endregion
 
-        #region Sending and Receiving
+        #region Packets
 
-        private void ReceivedPacket(byte[] Data, NetworkConnection<GMPacket> Connection)
+        public void Send(GMPacket Packet)
         {
-            try
-            {
-                GMPacket Packet = GMPacket.Create(Data);
-                Logger.Log("Received Packet: " + Packet.Type);
-            }
-            catch (Exception E)
-            {
-                Logger.Log(E, true);
-                Dispose();
-            }
+            _UDP.Send(Packet);
+        }
+
+        private void OnReceivePacket(GMPacket Packet)
+        {
+            //Logger.Log($"Received {Packet.Type} Packet");
+        }
+
+        private void OnDisconnect()
+        {
+            Manager.ClientDisconnected(this);
         }
 
         #endregion
 
         #region Disposal
 
-        public void Dispose()
+        public void Dispose(string Reason)
         {
-            if (ConnectionTCP != null)
-            {
-                ConnectionTCP.Dispose();
-                ConnectionTCP = null;
-            }
-
-            if (ConnectionUDP != null)
-            {
-                ConnectionUDP.Dispose();
-                ConnectionUDP = null;
-            }
-
+            _UDP.Dispose(Reason);
+            Manager.FreePort(_Port);
             Manager = null;
         }
 

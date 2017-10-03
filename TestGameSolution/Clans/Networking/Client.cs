@@ -1,40 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using TestGameUtilities.Definitions.Net;
 using TestGameUtilities.Definitions.Net.Client;
+using TestGameUtilities.Definitions.Net.Client.FromClient;
 using Utilities.Net;
 
 namespace Clans.Networking
 {
     public class Client
     {
-        /// <summary>
-        /// The <see cref="NetworkConnection{TPacket}"/> used to send TCP packets to the client
-        /// </summary>
-        private NetworkConnection<GMPacket> ConnectionTCP;
+        public const string Game_IP = "127.0.0.1";
 
-        /// <summary>
-        /// The <see cref="NetworkConnection{TPacket}"/> used to send UDP packets to the client
-        /// </summary>
-        private NetworkConnection<GMPacket> ConnectionUDP;
+        public double Latency => _UDP.Latency;
+        private UDPClient _UDP;
 
-        public Client()
+        public Client(int Port)
         {
-            ConnectionTCP = new NetworkConnection<GMPacket>(SocketType.Stream, ProtocolType.Tcp, 2);
-            ConnectionUDP = new NetworkConnection<GMPacket>(SocketType.Dgram, ProtocolType.Udp, 2);
-        }
-
-        public void Connect(string Host, int Port, Action<bool> Callback)
-        {
-            ConnectionTCP.Connect(Host, Port, (TcpConnected) =>
+            _UDP = new UDPClient(new IPEndPoint(IPAddress.Parse(Game_IP), Port), 0);
+            _UDP.Send(new GMHelloPacket
             {
-                if (TcpConnected)
-                    ConnectionUDP.Connect(Host, Port, Callback);
-                else
-                    Callback(TcpConnected);
+                Username = "Test123",
+                Key = "KeyTest123",
+                Version = "1.0"
             });
         }
     }

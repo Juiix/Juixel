@@ -28,12 +28,6 @@ namespace Juixel.Drawing
         public Rectangle? CenterRect;
 
         /// <summary>
-        /// The point within the sprite that it will center on 0.0 - 1.0 values.
-        /// (0, 0) will be the top left corner
-        /// </summary>
-        public Location AnchorPoint;
-
-        /// <summary>
         /// The height of the sprite.
         /// This property will raise the sprite without changing it's layer
         /// </summary>
@@ -56,7 +50,7 @@ namespace Juixel.Drawing
         public override Location Size
         {
             get => new Location(Sprite.Source.Width * Scale.X, Sprite.Source.Height * Scale.Y);
-            set => Scale = new Location(Sprite.Source.Width / value.X, Sprite.Source.Y / value.Y);
+            set => Scale = new Location(value.X / Sprite.Source.Width, value.Y / Sprite.Source.Height);
         }
 
         #endregion
@@ -87,9 +81,49 @@ namespace Juixel.Drawing
                 if (SnapToPixel) DrawPosition = DrawPosition.Round();
                 Location Size = this.Size * Scale;
                 Scale *= this.Scale;
+                Color Color = this.Color * (Alpha * this.Alpha);
+                Rotation += this.Rotation;
+                float Radians = (float)Rotation.Radians;
+
                 if (DrawPosition.X + Size.X >= 0 && DrawPosition.Y + Size.X >= 0 && DrawPosition.X - Size.X < JuixelGame.WindowWidth && DrawPosition.Y - Size.X < JuixelGame.WindowHeight)
-                    SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
-                        new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+                {
+                    if (!CenterRect.HasValue)
+                        SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color, (float)(Rotation.Radians + this.Rotation.Radians),
+                            new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+                    else
+                    {
+                        DrawPosition -= Size * AnchorPoint;
+                        Rectangle ScaleRect = CenterRect.Value;
+
+                        Vector2 centerScale = new Vector2((float)(Size.X - ScaleRect.X * 2) / ScaleRect.Width, (float)(Size.Y - ScaleRect.Y * 2) / ScaleRect.Height);
+                        Vector2 centerSize = new Vector2(ScaleRect.Width * centerScale.X, ScaleRect.Height * centerScale.Y);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(ScaleRect.X, ScaleRect.Y))).ToVector2(), ScaleRect, Color, Radians, Vector2.Zero, centerScale, SpriteEffects.None, 0);
+
+                        Rectangle topLeft = new Rectangle(0, 0, ScaleRect.X, ScaleRect.Y);
+                        SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), topLeft, Color, Radians, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+                        Rectangle topCenter = new Rectangle(ScaleRect.X, 0, ScaleRect.Width, ScaleRect.Y);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(ScaleRect.X, 0))).ToVector2(), topCenter, Color, Radians, Vector2.Zero, new Vector2(centerScale.X, 1), SpriteEffects.None, 0);
+
+                        Rectangle topRight = new Rectangle(ScaleRect.X + ScaleRect.Width, 0, ScaleRect.X, ScaleRect.Y);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(ScaleRect.X + centerSize.X, 0))).ToVector2(), topRight, Color, Radians, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+                        Rectangle leftCenter = new Rectangle(0, ScaleRect.Y, ScaleRect.X, ScaleRect.Height);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(0, ScaleRect.Y))).ToVector2(), leftCenter, Color, Radians, Vector2.Zero, new Vector2(1, centerScale.Y), SpriteEffects.None, 0);
+
+                        Rectangle rightCenter = new Rectangle(ScaleRect.X + ScaleRect.Width, ScaleRect.Y, ScaleRect.X, ScaleRect.Height);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(ScaleRect.X + centerSize.X, ScaleRect.Y))).ToVector2(), rightCenter, Color, Radians, Vector2.Zero, new Vector2(1, centerScale.Y), SpriteEffects.None, 0);
+
+                        Rectangle botLeft = new Rectangle(0, ScaleRect.Y + ScaleRect.Height, ScaleRect.X, ScaleRect.Y);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(0, ScaleRect.Y + centerSize.Y))).ToVector2(), botLeft, Color, Radians, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+
+                        Rectangle botCenter = new Rectangle(ScaleRect.X, ScaleRect.Y + ScaleRect.Height, ScaleRect.Width, ScaleRect.Y);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(ScaleRect.X, ScaleRect.Y + centerSize.Y))).ToVector2(), botCenter, Color, Radians, Vector2.Zero, new Vector2(centerScale.X, 1), SpriteEffects.None, 0);
+
+                        Rectangle botRight = new Rectangle(ScaleRect.X + ScaleRect.Width, ScaleRect.Y + ScaleRect.Height, ScaleRect.X, ScaleRect.Y);
+                        SpriteBatch.Draw(Sprite.Texture, (DrawPosition + Geometry.RotateAroundOrigin(Rotation, new Location(ScaleRect.X + centerSize.X, ScaleRect.Y + centerSize.Y))).ToVector2(), botRight, Color, Radians, Vector2.Zero, Vector2.One, SpriteEffects.None, 0);
+                    }
+                }
                 base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
             }
         }

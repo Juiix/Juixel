@@ -77,6 +77,8 @@ namespace Utilities
 
         public IntLocation Int => new IntLocation((int)(X + 0.5), (int)(Y + 0.5));
 
+        public Location Abs => new Location(Math.Abs(X), Math.Abs(Y));
+
         public IntLocation IntFloor => new IntLocation((int)X, (int)Y);
 
         public void Read(NetworkReader R)

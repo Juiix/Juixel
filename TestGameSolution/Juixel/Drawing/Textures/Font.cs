@@ -14,14 +14,30 @@ namespace Juixel.Drawing.Textures
     {
         #region Static
 
+        private static string DefaultName;
         public static Font Default;
         private static Dictionary<string, Font> _Fonts = new Dictionary<string, Font>();
 
-        public static void AddFont(string Name, Font Font)
+        public static void AddFont(string Name, BitmapFont BMFont, int Height)
         {
-            if (Default == null)
-                Default = Font;
-            _Fonts.Add(Name, Font);
+            if (_Fonts.ContainsKey(Name))
+            {
+                if (DefaultName == Name)
+                    Default.AddSize(BMFont, Height);
+                else
+                    _Fonts[Name].AddSize(BMFont, Height);
+            }
+            else
+            {
+                Font Font = new Font();
+                Font.AddSize(BMFont, Height);
+                if (Default == null)
+                {
+                    DefaultName = Name;
+                    Default = Font;
+                }
+                _Fonts.Add(Name, Font);
+            }
         }
 
         public static Font GetFont(string Name)
@@ -33,15 +49,63 @@ namespace Juixel.Drawing.Textures
 
         #endregion
 
-        public Font(BitmapFont Font, int Height)
+        public List<FontInfo> Sizes = new List<FontInfo>();
+
+        public void AddSize(BitmapFont BMFont, int Height)
         {
-            BaseFont = Font;
-            this.Height = Height;
+            FontInfo Font = new FontInfo { BMFont = BMFont, Height = Height };
+            for (int i = 0; i < Sizes.Count; i++)
+                if (Sizes[i].Height > Height)
+                {
+                    Sizes.Insert(i, Font);
+                    return;
+                }
+            Sizes.Add(Font);
         }
 
-        public BitmapFont BaseFont;
+        public FontInfo GetSized(double Size)
+        {
+            for (int i = 0; i < Sizes.Count; i++)
+            {
+                FontInfo Font = Sizes[i];
+                if (Font.Height > Size)
+                {
+                    if (i == 0)
+                        return Font;
+                    else
+                    {
+                        FontInfo Lower = Sizes[i - 1];
+                        return Font.Height - Size > Size - Lower.Height ? Lower : Font;
+                    }
+                }
+            }
+            return Sizes[Sizes.Count - 1];
+        }
+
+        public Location MeasureString(string Text, double Height)
+        {
+            FontInfo Info = GetSized(Height);
+            Size2 Size = Info.BMFont.MeasureString(Text);
+            double Scalar = Height / Info.Height;
+            return new Location(Size.Width * Scalar, Size.Height * Scalar);
+        }
+
+        public static implicit operator Font(string Name) => GetFont(Name);
+    }
+
+    public class FontInfo : IComparable<FontInfo>
+    {
+        public BitmapFont BMFont;
         public int Height;
 
-        public Size2 MeasureString(string Text) => BaseFont.MeasureString(Text);
+        public int CompareTo(FontInfo other)
+        {
+            if (Height > other.Height)
+                return 1;
+            else if (Height < other.Height)
+                return -1;
+            else
+                return 0;
+        }
     }
 }

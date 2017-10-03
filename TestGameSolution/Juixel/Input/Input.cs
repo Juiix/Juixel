@@ -4,12 +4,15 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Utilities.Logging;
 using Utilities.Threading;
+using Win32;
 
-namespace Juixel.Input
+namespace Juixel.Interaction
 {
     public class Input
     {
@@ -19,44 +22,69 @@ namespace Juixel.Input
         public static void StepInput()
         {
             KeyboardState NewKeyState = Keyboard.GetState();
-            var KeyHandlers = _KeyHandlers.ToArray();
-            for (int i = 0; i < KeyHandlers.Length; i++)
+            if (JuixelGame.Shared.Active)
             {
-                var Pair = KeyHandlers[i];
-                var Handlers = Pair.Value.ToArray();
-                bool WasKeyDown = _LastKeyState.IsKeyDown(Pair.Key);
-                bool IsKeyDown = NewKeyState.IsKeyDown(Pair.Key);
+                CapsLock = (User.GetKeyState(VKey.CAPITAL) & 1) != 0;
+                NumLock = (User.GetKeyState(VKey.NUMLOCK) & 1) != 0;
+                ScrollLock = (User.GetKeyState(VKey.SCROLL) & 1) != 0;
 
-                if (IsKeyDown && !WasKeyDown)
-                    for (int e = 0; e < Handlers.Length; e++)
-                        Handlers[e].KeyDown(Pair.Key);
-                else if (!IsKeyDown && WasKeyDown)
-                    for (int e = 0; e < Handlers.Length; e++)
-                        Handlers[e].KeyUp(Pair.Key);
+                var KeyHandlers = _KeyHandlers.ToArray();
+                for (int i = 0; i < KeyHandlers.Length; i++)
+                {
+                    var Pair = KeyHandlers[i];
+                    var Handlers = Pair.Value.ToArray();
+                    bool WasKeyDown = _LastKeyState.IsKeyDown(Pair.Key);
+                    bool IsKeyDown = NewKeyState.IsKeyDown(Pair.Key);
+
+                    if (IsKeyDown && !WasKeyDown)
+                        for (int e = 0; e < Handlers.Length; e++)
+                            Handlers[e].KeyDown(Pair.Key);
+                    else if (!IsKeyDown && WasKeyDown)
+                        for (int e = 0; e < Handlers.Length; e++)
+                            Handlers[e].KeyUp(Pair.Key);
+                }
             }
             _LastKeyState = NewKeyState;
 
             MouseState NewMouseState = Mouse.GetState();
-            var MouseHandlers = _MouseHandlers.ToArray();
+            if (JuixelGame.Shared.Active)
+            {
+                var MouseHandlers = _MouseHandlers.ToArray();
 
-            Point P_LastMousePosition = _LastMouseState.Position;
-            Point P_NewMousePosition = NewMouseState.Position;
+                Point P_LastMousePosition = _LastMouseState.Position;
+                Point P_NewMousePosition = NewMouseState.Position;
 
-            Location LastMousePosition = new Location(P_LastMousePosition.X, P_LastMousePosition.Y);
-            Location NewMousePosition = new Location(P_NewMousePosition.X, P_NewMousePosition.Y);
+                Location LastMousePosition = new Location(P_LastMousePosition.X, P_LastMousePosition.Y);
+                Location NewMousePosition = new Location(P_NewMousePosition.X, P_NewMousePosition.Y);
 
-            if (NewMousePosition != LastMousePosition)
-                for (int i = 0; i < MouseHandlers.Length; i++)
-                    MouseHandlers[i].MouseMoved(0, NewMousePosition);
+                if (_LastMouseState.LeftButton == ButtonState.Released && NewMouseState.LeftButton == ButtonState.Pressed)
+                {
+                    JuixelGame.Shared.CurrentScene.OnSelectDown(0, NewMousePosition);
+                    for (int i = 0; i < MouseHandlers.Length; i++)
+                        MouseHandlers[i].MouseDown(0, NewMousePosition);
+                }
 
-            if (_LastMouseState.LeftButton == ButtonState.Released && NewMouseState.LeftButton == ButtonState.Pressed)
-                for (int i = 0; i < MouseHandlers.Length; i++)
-                    MouseHandlers[i].MouseDown(0, NewMousePosition);
+                if (NewMousePosition != LastMousePosition)
+                {
+                    JuixelGame.Shared.CurrentScene.OnSelectMoved(0, NewMousePosition);
+                    for (int i = 0; i < MouseHandlers.Length; i++)
+                        MouseHandlers[i].MouseMoved(0, NewMousePosition);
+                }
 
-            if (_LastMouseState.LeftButton == ButtonState.Pressed && NewMouseState.LeftButton == ButtonState.Released)
-                for (int i = 0; i < MouseHandlers.Length; i++)
-                    MouseHandlers[i].MouseUp(0, NewMousePosition);
+                if (_LastMouseState.LeftButton == ButtonState.Pressed && NewMouseState.LeftButton == ButtonState.Released)
+                {
+                    JuixelGame.Shared.CurrentScene.OnSelectUp(0, NewMousePosition);
+                    for (int i = 0; i < MouseHandlers.Length; i++)
+                        MouseHandlers[i].MouseUp(0, NewMousePosition);
+                }
 
+                if (_LastMouseState.ScrollWheelValue != NewMouseState.ScrollWheelValue)
+                {
+                    int Amount = NewMouseState.ScrollWheelValue - _LastMouseState.ScrollWheelValue;
+                    for (int i = 0; i < MouseHandlers.Length; i++)
+                        MouseHandlers[i].MouseScroll(Amount);
+                }
+            }
             _LastMouseState = NewMouseState;
         }
 
@@ -66,6 +94,10 @@ namespace Juixel.Input
 
         private static ConcurrentDictionary<Keys, HashSet<IKeyHandler>> _KeyHandlers
             = new ConcurrentDictionary<Keys, HashSet<IKeyHandler>>();
+
+        public static bool CapsLock;
+        public static bool NumLock;
+        public static bool ScrollLock;
 
         /// <summary>
         /// Add a listener for key changes
@@ -122,6 +154,10 @@ namespace Juixel.Input
 
         public static int MouseY => _LastMouseState.Position.Y;
 
+        public static int MouseScrollValue => _LastMouseState.ScrollWheelValue;
+
+        public static bool MouseOnScreen => MouseX >= 0 && MouseX < JuixelGame.WindowWidth && MouseY >= 0 && MouseY < JuixelGame.WindowHeight;
+
         public static void ListenForMouse(IMouseHandler Handler)
         {
             _MouseHandlers.Add(Handler);
@@ -139,5 +175,22 @@ namespace Juixel.Input
 
 
         #endregion
+    }
+}
+
+namespace Win32
+{
+    public enum VKey
+    {
+        // Tons of other VK_ codes removed.
+        CAPITAL = 0x14,
+        NUMLOCK = 0x90,
+        SCROLL = 0x91,
+    }
+
+    public static class User
+    {
+        [DllImport("user32.dll")]
+        public static extern short GetKeyState(VKey vkey);
     }
 }

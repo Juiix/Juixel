@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Utilities;
 
-namespace Juixel.Input
+namespace Juixel.Interaction
 {
     public interface IKeyHandler
     {
@@ -19,5 +19,6 @@ namespace Juixel.Input
         void MouseDown(int Id, Location Location);
         void MouseMoved(int Id, Location Location);
         void MouseUp(int Id, Location Location);
+        void MouseScroll(int Amount);
     }
 }

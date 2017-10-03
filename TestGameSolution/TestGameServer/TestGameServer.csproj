@@ -43,10 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Networking\Clients\ClientManager.cs" />
     <Compile Include="Networking\Clients\Client.cs" />
+    <Compile Include="Networking\Clients\ClientManager.cs" />
     <Compile Include="Networking\Clients\GMPacketHandler.cs" />
     <Compile Include="Networking\Clients\Handlers\GMHelloPacketHandler.cs" />
+    <Compile Include="Networking\UDPDispatcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Worlds\WorldManager.cs" />

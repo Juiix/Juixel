@@ -65,5 +65,19 @@ namespace Utilities.Threading
                 return Array;
             }
         }
+
+        public T TakeFirst()
+        {
+            lock (_Sync)
+            {
+                if (Count > 0)
+                {
+                    T Value = _List[0];
+                    _List.RemoveAt(0);
+                    return Value;
+                }
+                return default(T);
+            }
+        }
     }
 }

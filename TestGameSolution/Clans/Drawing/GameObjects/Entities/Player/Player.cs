@@ -19,7 +19,21 @@ namespace Clans.Drawing.GameObjects
     {
         #region Init
 
-        public DropBloodEffect BloodDrops;
+        private double _Health = 1.0;
+        public double Health
+        {
+            get => _Health;
+            set
+            {
+                value = Math.Min(1.0, Math.Max(0, value));
+                _Health = value;
+                BloodDrops.DropsPerSecond = (1 - value) * 15;
+                BloodTrail.DropsPerSecond = BloodDrops.DropsPerSecond * 8;
+            }
+        }
+
+        private DropBloodEffect BloodDrops;
+        private GroundBloodEffect BloodTrail;
 
         public Player() : base()
         {
@@ -34,7 +48,11 @@ namespace Clans.Drawing.GameObjects
 
             BloodDrops = new DropBloodEffect(new Location(-3, -4), new Location(5, 2), 0.5);
             BloodDrops.Position = new Location(-2.5, 0);
+            BloodDrops.DropsPerSecond = 0;
             AddChild(BloodDrops);
+
+            BloodTrail = new GroundBloodEffect(this, 4, 5);
+            BloodTrail.DropsPerSecond = 0;
 
             EquippedArmor = new ItemData()
             {
@@ -50,6 +68,18 @@ namespace Clans.Drawing.GameObjects
             {
                 FileIndex = 0
             };
+        }
+
+        protected override void OnParentAdd()
+        {
+            base.OnParentAdd();
+            Parent.AddChild(BloodTrail);
+        }
+
+        protected override void OnParentRemove()
+        {
+            base.OnParentRemove();
+            BloodTrail.RemoveFromParent();
         }
 
         #endregion

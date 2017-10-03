@@ -13,6 +13,10 @@ namespace TestGameUtilities.Definitions.Net.Client
         Update = 2,
         Move = 3,
         Shoot = 4,
-        Hello = 5
+        Hello = 5,
+        Disconnect = 6,
+        Connect = 7,
+        Ping = 8,
+        Pong = 9
     }
 }

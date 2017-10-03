@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Utilities;
 using Juixel;
 using Utilities.Tools;
-using Juixel.Input;
 using Microsoft.Xna.Framework.Input;
 using Clans.Drawing.ParticleSystems;
 using Juixel.Drawing.Tiles;
@@ -17,6 +16,9 @@ using Clans.Drawing.GameObjects;
 using Clans.Data;
 using Utilities.JMath;
 using Microsoft.Xna.Framework.Graphics;
+using Clans.Networking;
+using Utilities.Logging;
+using Juixel.Interaction;
 
 namespace Clans.Scenes
 {
@@ -29,18 +31,32 @@ namespace Clans.Scenes
         private Player Player;
         private TileManager Tiles;
         private SnowEffect Snow;
-        private GroundBloodEffect Blood;
+        private LabelNode Info;
+
+        private List<Player> Players = new List<Player>();
+
+        private Client Client;
 
         public LoadingScene(Location Size) : base(Size)
         {
+            ConnectionClient Connection = new ConnectionClient();
+            Connection.Connect((Port) =>
+            {
+                if (Port != 0)
+                {
+                    Logger.Log("Connecting on Port " + Port);
+                    Client = new Client(Port);
+                }
+                else
+                    Logger.Log("Failed to connect to remote host");
+                Connection.Dispose();
+            });
+
             Player = new Player();
             Player.Scale = 10;
             Player.Layer = 10;
             AddChild(Player);
-
-            Blood = new GroundBloodEffect(Player, 4, 5);
-            Blood.DropsPerSecond = 10;
-            AddChild(Blood);
+            Players.Add(Player);
 
             Tiles = new TileManager(2048, 2048, ClansGame.TestTileTexture, 8);
             Tiles.Scale = 5;
@@ -63,29 +79,14 @@ namespace Clans.Scenes
             Camera.Target = Player;
 
             Snow = new SnowEffect(2);
+            Snow.Intensity = 0;
             UI.AddChild(Snow);
 
-            LabelNode Info = new LabelNode(Font.Default, "WASD to move + and - to change the bleeding", 20);
+            Info = new LabelNode(Font.Default, "WASD to move + and - to change the bleeding", 20);
             Info.Position = new Location(Size.X / 2, Size.Y * 0.3);
             Info.AnchorPoint.X = 0.5;
             Info.Color = new Color(128, 128, 130);
             UI.AddChild(Info);
-
-            /*Color[] PerlinData = new Color[2048 * 2048];
-            for (int Y = 0; Y < Tiles.Height; Y++)
-                for (int X = 0; X < Tiles.Width; X++)
-                {
-                    float P = Perlin.GetNoise((((double)X / 2048) + 1) / 2, (((double)Y / 2048) + 1) / 2, 0);
-                    PerlinData[Y * 2048 + X] = new Color(P, P, P, 1);
-                }
-
-            Texture2D Texture = new Texture2D(JuixelGame.Shared.GraphicsDevice, 2048, 2048);
-            Texture.SetData(PerlinData);
-
-            SpriteNode Image = new SpriteNode(Texture);
-            Image.Scale = 1.0 / 4.0;
-            Image.Layer = 1000000;
-            UI.AddChild(Image);*/
 
             Input.ListenForKey(Keys.I, this);
             Input.ListenForKey(Keys.O, this);
@@ -124,33 +125,36 @@ namespace Clans.Scenes
 
             base.Update(Time);
 
-            if (Input.KeyIsDown(Keys.OemPlus))
+            if (Input.KeyIsDown(Keys.Y))
             {
                 var Player = new Player();
                 Player.Scale = 10;
-                Player.Layer = 10;
                 Player.Position = Location.Random * 1000;
+                Player.Layer = Player.Position.Y;
                 AddChild(Player);
+                Players.Add(Player);
 
                 Player = new Player();
                 Player.Scale = 10;
-                Player.Layer = 10;
                 Player.Position = Location.Random * 1000;
+                Player.Layer = Player.Position.Y;
                 AddChild(Player);
+                Players.Add(Player);
             }
 
-            /*
+            
             if (Input.KeyIsDown(Keys.OemPlus))
-            {
-                Player.BloodDrops.DropsPerSecond *= 1.05;
-                if (Player.BloodDrops.DropsPerSecond == 0)
-                    Player.BloodDrops.DropsPerSecond = 0.1;
-            }
+                for (int i = 0; i < Players.Count; i++)
+                {
+                    Players[i].Health += 0.01;
+                }
+
             if (Input.KeyIsDown(Keys.OemMinus))
-                Player.BloodDrops.DropsPerSecond *= 1 / 1.05;
-            Player.BloodDrops.DropsPerSecond = (int)(Player.BloodDrops.DropsPerSecond * 1000) / 1000.0;
-            Blood.DropsPerSecond = Player.BloodDrops.DropsPerSecond * 8;
-            */
+                for (int i = 0; i < Players.Count; i++)
+                {
+                    Players[i].Health -= 0.01;
+                }
+
 
             IntLocation TilePosition = (Player.Position / Tiles.Scale / 8).IntFloor;
             Tile CurrentTile = Tiles.Get(TilePosition.X, TilePosition.Y);
@@ -185,6 +189,9 @@ namespace Clans.Scenes
             }
 
             JuixelGame.ShowDebugText(NodeCount.ToString(), 2);
+
+            if (Client != null)
+                Info.Text = Client.Latency.ToString();
         }
 
         private ushort WeaponIndex = 0;

@@ -21,28 +21,23 @@ namespace Juixel.Drawing
         /// The text displayed
         /// </summary>
         public string Text;
-        
+
+        private double _TextHeight;
         /// <summary>
         /// The height of the text
         /// </summary>
         public double TextHeight
         {
-            get => Font.Height * Scale.X;
-            set => Scale.X = value / Font.Height;
+            get => _TextHeight;
+            set => _TextHeight = value;
         }
-
-        /// <summary>
-        /// The point within the sprite that it will center on 0.0 - 1.0 values.
-        /// (0, 0) will be the top left corner
-        /// </summary>
-        public Location AnchorPoint;
 
         /// <summary>
         /// The font to be drawn
         /// </summary>
         private Font Font;
 
-        public override Location Size { get => new Location(Font.MeasureString(Text).Width * Scale.X, TextHeight * Scale.X); set { } }
+        public override Location Size { get { return Font.MeasureString(Text, _TextHeight * Scale.X); } set { } }
 
         #endregion
 
@@ -82,9 +77,10 @@ namespace Juixel.Drawing
         {
             Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale);
             Scale *= this.Scale;
-            Vector2 NormSize = Font.MeasureString(Text);
-            SpriteBatch.DrawString(Font.BaseFont, Text, DrawPosition.ToVector2(), Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
-                new Vector2(NormSize.X * (float)AnchorPoint.X, NormSize.Y * (float)AnchorPoint.Y), (float)(Scale * this.Scale).X, SpriteEffects.None, 0);
+            FontInfo Info = Font.GetSized(_TextHeight * Scale.X);
+            Vector2 NormSize = Info.BMFont.MeasureString(Text);
+            SpriteBatch.DrawString(Info.BMFont, Text, DrawPosition.ToVector2(), Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
+                new Vector2(NormSize.X * (float)AnchorPoint.X, NormSize.Y * (float)AnchorPoint.Y), (float)(Scale * this.Scale * (_TextHeight / Info.Height)).X, SpriteEffects.None, 0);
             base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
         }
 

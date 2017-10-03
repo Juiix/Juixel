@@ -8,10 +8,12 @@ namespace Juixel
 {
     public enum DeviceType
     {
-        iOS,
-        Android,
-        PC,
-        Mac
+        iOS = 1,
+        Android = 2,
+        Mobile = 3,
+        PC = 4,
+        Mac = 8,
+        Desktop = 12
     }
 
     public class JuixelTime

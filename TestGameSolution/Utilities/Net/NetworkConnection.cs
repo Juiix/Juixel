@@ -75,7 +75,7 @@ namespace Utilities.Net
             _Socket.SendTimeout = Send_Timeout;
             _Socket.ReceiveTimeout = Receive_Timeout;
 
-            _Buffer = new NetworkBuffer(PacketSizeLength);
+            _Buffer = new NetworkBuffer(BufferState.Size, 2);
         }
 
         /// <summary>
@@ -90,7 +90,9 @@ namespace Utilities.Net
             _Socket.SendTimeout = Send_Timeout;
             _Socket.ReceiveTimeout = Receive_Timeout;
 
-            _Buffer = new NetworkBuffer(PacketSizeLength);
+            _Socket.NoDelay = true;
+
+            _Buffer = new NetworkBuffer(BufferState.Size, 2);
         }
 
         /// <summary>
@@ -173,7 +175,7 @@ namespace Utilities.Net
             try
             {
                 int Read = _Socket.EndReceive(AR);
-                _Buffer.Position += (ushort)Read;
+                _Buffer.Position += Read;
                 LastReceived = DateTime.Now;
 
                 if (Read <= 0)
@@ -190,7 +192,7 @@ namespace Utilities.Net
                 else
                 {
                     OnReceivePacket(_Buffer.GetData(), this);
-                    _Buffer.Reset(BufferState.Size);
+                    _Buffer.Reset(BufferState.Size, 2);
 
                     BeginReceive(_Buffer.Position, _Buffer.RemainingBytes);
                 }
@@ -263,50 +265,46 @@ namespace Utilities.Net
 
         #endregion
 
-        private class NetworkBuffer
+    }
+
+    public class NetworkBuffer
+    {
+        private const int Max_Buffer_Size = 65536;
+
+        public byte[] Buffer = new byte[Max_Buffer_Size];
+        public int Position = 0;
+        public int Size = 2;
+        public BufferState State = BufferState.Size;
+
+        public int RemainingBytes => Size - Position;
+
+        public NetworkBuffer(BufferState State, int Size)
         {
-            private const int Max_Buffer_Size = 65536;
-
-            private int _SizeLength;
-
-            public byte[] Buffer = new byte[Max_Buffer_Size];
-            public int Position = 0;
-            public int Size = 2;
-            public BufferState State = BufferState.Size;
-
-            public int RemainingBytes => Size - Position;
-
-            public NetworkBuffer(int SizeLength)
-            {
-                _SizeLength = SizeLength;
-                Size = SizeLength;
-            }
-
-            public void Reset(BufferState State, int? Size = null)
-            {
-                if (Size == null)
-                    Size = _SizeLength;
-                int S = Size.Value;
-
-                if (S > Max_Buffer_Size)
-                    throw new InvalidOperationException(Size + " is larger than the preset buffer size");
-                this.Size = S;
-                this.State = State;
-                Position = 0;
-            }
-
-            public byte[] GetData()
-            {
-                byte[] Data = new byte[Position];
-                Array.Copy(Buffer, 0, Data, 0, Position);
-                return Data;
-            }
+            Reset(State, Size);
         }
 
-        private enum BufferState
+        public void Reset(BufferState State, int Size)
         {
-            Size,
-            Data
+            if (Size > Max_Buffer_Size)
+                throw new InvalidOperationException(Size + " is larger than the preset buffer size");
+            this.Size = Size;
+            this.State = State;
+            Position = 0;
+        }
+
+        public byte[] GetData()
+        {
+            byte[] Data = new byte[Position];
+            Array.Copy(Buffer, 0, Data, 0, Position);
+            return Data;
         }
     }
+
+    public enum BufferState
+    {
+        Header,
+        Size,
+        Data
+    }
+
 }
