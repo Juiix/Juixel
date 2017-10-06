@@ -1,0 +1,297 @@
+<Grounds>
+  <Ground type="400" id="Grass">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>0</FileIndex>
+    <RandomTile>0,1,2</RandomTile>
+    <Color>009a4e</Color>
+    <Blend>4</Blend>
+  </Ground>
+  <Ground type="401" id="Brick Road">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>3</FileIndex>
+    <RandomTile>3,4,5,6</RandomTile>
+    <Color>a67c52</Color>
+    <Blend>20</Blend>
+  </Ground>
+  <Ground type="402" id="Shallow Water">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>7</FileIndex>
+    <Speed>0.7</Speed>
+    <Sinks></Sinks>
+    <Color>5f8be3</Color>
+    <Blend>20</Blend>
+  </Ground>
+  <Ground type="403" id="Stone Road">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>8</FileIndex>
+    <RandomTile>8,9,a,b</RandomTile>
+    <Color>818181</Color>
+    <Blend>20</Blend>
+  </Ground>
+  <Ground type="404" id="Deep Water">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>c</FileIndex>
+    <NoWalk></NoWalk>
+    <Color>4768aa</Color>
+    <Blend>21</Blend>
+  </Ground>
+  <Ground type="405" id="Beach Sand">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>f</FileIndex>
+    <Color>d4b053</Color>
+    <Blend>1</Blend>
+  </Ground>
+  <Ground type="406" id="Wood Bridge">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>e</FileIndex>
+    <Color>9e7752</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="407" id="Yellow Grass">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>10</FileIndex>
+    <RandomTile>10,11,12</RandomTile>
+    <Color>93b13e</Color>
+    <Blend>5</Blend>
+  </Ground>
+  <Ground type="408" id="Dark Grass">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>13</FileIndex>
+    <RandomTile>13,14,15</RandomTile>
+    <Color>2d744c</Color>
+    <Blend>3</Blend>
+  </Ground>
+  <Ground type="409" id="Blue Grass">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>16</FileIndex>
+    <RandomTile>16,17,18</RandomTile>
+    <Color>395e60</Color>
+    <Blend>2</Blend>
+  </Ground>
+  <Ground type="40a" id="Snow">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>19</FileIndex>
+    <RandomTile>19,1a,1b</RandomTile>
+    <Color>ffffff</Color>
+    <Blend>7</Blend>
+  </Ground>
+  <Ground type="40b" id="Sand">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>d</FileIndex>
+    <Color>ecd291</Color>
+    <Blend>1</Blend>
+  </Ground>
+  <Ground type="40c" id="Rock">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>1c</FileIndex>
+    <RandomTile>1c,1d,1e</RandomTile>
+    <Color>393939</Color>
+    <Blend>6</Blend>
+  </Ground>
+  <Ground type="40d" id="Marble Tile">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>1f</FileIndex>
+    <RandomTile>1f,20,21,22</RandomTile>
+    <Color>818181</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="40e" id="Ice">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>23</FileIndex>
+    <RandomTile>23,24,25,26</RandomTile>
+    <Color>d9e6ff</Color>
+    <Blend>9</Blend>
+    <Slides></Slides>
+  </Ground>
+  <Ground type="40f" id="Dark Rocky">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>27</FileIndex>
+    <RandomTile>27,28,29</RandomTile>
+    <Color>1c1c1c</Color>
+  </Ground>
+  <Ground type="410" id="Pink Void">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>2a</FileIndex>
+    <RandomTile>2a,2b,2c</RandomTile>
+    <Color>3f1259</Color>
+    <Blend>10</Blend>
+  </Ground>
+  <Ground type="411" id="Light Rock">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>2d</FileIndex>
+    <RandomTile>2d,2e,2f,30,31,32</RandomTile>
+    <Color>2b2b2b</Color>
+  </Ground>
+  <Ground type="412" id="Lava Rock">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>33</FileIndex>
+    <RandomTile>33,34,35,36</RandomTile>
+    <Color>2b2b2b</Color>
+  </Ground>
+  <Ground type="413" id="Marsh Grass">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>37</FileIndex>
+    <RandomTile>37,38,39,3a</RandomTile>
+    <Color>432942</Color>
+    <Blend>1</Blend>
+  </Ground>
+  <Ground type="414" id="Marsh Water">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>3b</FileIndex>
+    <Color>1b6722</Color>
+    <Speed>0.7</Speed>
+    <Sinks></Sinks>
+  </Ground>
+  <Ground type="415" id="Yellow Asura">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>3c</FileIndex>
+    <RandomTile>3c,3d</RandomTile>
+    <Color>7e6503</Color>
+  </Ground>
+  <Ground type="416" id="Red Asura">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>3e</FileIndex>
+    <RandomTile>3e,3f</RandomTile>
+    <Color>760b00</Color>
+  </Ground>
+  <Ground type="417" id="Asura Sand Stone">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>40</FileIndex>
+    <RandomTile>40,41,42,43,40,41,42,43,44,45,46</RandomTile>
+    <Color>ffebba</Color>
+  </Ground>
+  <Ground type="418" id="Guild Rug Side 1">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>47</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="419" id="Guild Rug Side 2">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>48</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="41a" id="Guild Rug Side 3">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>49</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="41b" id="Guild Rug Side 4">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>4a</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="41c" id="Guild Rug Corner 1">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>4b</FileIndex>
+    <Color>b41100</Color>
+  </Ground>
+  <Ground type="41d" id="Guild Rug Corner 2">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>4c</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="41e" id="Guild Rug Corner 3">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>4d</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="41f" id="Guild Rug Corner 4">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>4e</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="420" id="Guild Rug Center">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>4f</FileIndex>
+    <Color>b41100</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="421" id="Red Leaves">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>50</FileIndex>
+    <RandomTile>50,51,52</RandomTile>
+    <Color>4b1d16</Color>
+    <Blend>1</Blend>
+  </Ground>
+  <Ground type="422" id="Forest River Water">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>53</FileIndex>
+    <Speed>0.7</Speed>
+    <Sinks></Sinks>
+    <Color>35354d</Color>
+  </Ground>
+  <Ground type="423" id="Black">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>54</FileIndex>
+    <NoWalk></NoWalk>
+    <Color>000000</Color>
+    <Blend>100</Blend>
+  </Ground>
+  <Ground type="424" id="Guild Stone">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>55</FileIndex>
+    <RandomTile>55,56,57</RandomTile>
+    <Color>6c6f73</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="425" id="Guild Wood">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>58</FileIndex>
+    <RandomTile>58,59,5a,5b</RandomTile>
+    <Color>7b340b</Color>
+    <Blend>-1</Blend>
+  </Ground>
+  <Ground type="426" id="Guild Wood Dark">
+    <Class>Tile</Class>
+    <File>Tiles_8x8</File>
+    <FileIndex>5c</FileIndex>
+    <RandomTile>5c,5d,5e,5f</RandomTile>
+    <Color>6c2e0a</Color>
+    <Blend>-1</Blend>
+  </Ground>
+</Grounds>

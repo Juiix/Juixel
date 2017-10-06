@@ -1,9 +1,0 @@
-﻿<Objects>
-  <Object type="0x100" name="Wolfskin Hide">
-    <Class>Armor</Class>
-    <FileName>PlayerParts-1</FileName>
-    <FileIndex>0x2</FileIndex>
-    <DisplayFile>None</DisplayFile>
-    <DisplayIndex>0x0</DisplayIndex>
-  </Object>
-</Objects>
