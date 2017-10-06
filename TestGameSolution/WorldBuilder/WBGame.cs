@@ -16,7 +16,9 @@ namespace WorldBuilder
     public class WBGame : JuixelGame
     {
         public static Texture2D ButtonSprite;
-        public static Texture2D TestTileSprites;
+        public static Texture2D TileSheet;
+
+        public override string DataSavePath => "WorldBuilder\\Data\\";
 
         public WBGame(Game Game, DeviceType Device) : base(Game, Device)
         {
@@ -27,13 +29,13 @@ namespace WorldBuilder
 
         protected override Scene MakeFirstScene()
         {
-            return new LoadingScene(new Location(WindowWidth, WindowHeight));
+            return new SelectionScene(new Location(WindowWidth, WindowHeight));
         }
 
         public override void LoadContent()
         {
-            ButtonSprite = Content.Load<Texture2D>("ChatBubble");
-            TestTileSprites = Content.Load<Texture2D>("WBTestTiles");
+            ButtonSprite = Content.Load<Texture2D>("Button-Rect");
+            //TestTileSprites = Content.Load<Texture2D>("WBTestTiles");
 
             base.LoadContent();
         }

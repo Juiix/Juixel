@@ -34,7 +34,7 @@ namespace Juixel.Drawing.Actions
             _ResetAction?.Invoke(Node);
         }
 
-        #region Actions
+        #region Base Actions
 
         public static JAction Wait(double Duration)
         {
@@ -105,6 +105,62 @@ namespace Juixel.Drawing.Actions
             }, (Node) => { First = true; });
         }
 
+        public static JAction MoveTo(Location To, double Duration, StepType Type = StepType.Linear)
+        {
+            return Group(MoveToX(To.X, Duration, Type), MoveToY(To.Y, Duration, Type));
+        }
+
+        public static JAction MoveByX(double To, double Duration, StepType Type = StepType.Linear)
+        {
+            double StartX = 0;
+            bool First = true;
+            return new JAction((Node, Step) =>
+            {
+                if (First)
+                {
+                    First = false;
+                    StartX = Node.Position.X;
+                }
+                double Distance = To;
+                double RealStep = ProcessStep(Step / Duration, Type);
+                Node.Position = new Location(StartX + Distance * RealStep, Node.Position.Y);
+                if (RealStep >= 1)
+                {
+                    Node.Position = new Location(StartX + To, Node.Position.Y);
+                    return true;
+                }
+                return false;
+            }, (Node) => { First = true; });
+        }
+
+        public static JAction MoveByY(double To, double Duration, StepType Type = StepType.Linear)
+        {
+            double StartY = 0;
+            bool First = true;
+            return new JAction((Node, Step) =>
+            {
+                if (First)
+                {
+                    First = false;
+                    StartY = Node.Position.Y;
+                }
+                double Distance = To;
+                double RealStep = ProcessStep(Step / Duration, Type);
+                Node.Position = new Location(Node.Position.X, StartY + Distance * RealStep);
+                if (RealStep >= 1)
+                {
+                    Node.Position = new Location(Node.Position.X, StartY + To);
+                    return true;
+                }
+                return false;
+            }, (Node) => { First = true; });
+        }
+
+        public static JAction MoveBy(Location To, double Duration, StepType Type = StepType.Linear)
+        {
+            return Group(MoveByX(To.X, Duration, Type), MoveByY(To.Y, Duration, Type));
+        }
+
         public static JAction Sequence(params JAction[] Actions)
         {
             int Count = 0;
@@ -130,16 +186,20 @@ namespace Juixel.Drawing.Actions
         public static JAction Group(params JAction[] Actions)
         {
             List<int> Done = new List<int>();
+            double LastStep = 0;
             return new JAction((Node, Step) =>
             {
+                double RealStep = Step - LastStep;
+                LastStep = Step;
                 for (int i = 0; i < Actions.Length; i++)
                     if (!Done.Contains(i))
-                        if (Actions[i].Run(Node, Step))
+                        if (Actions[i].Run(Node, RealStep))
                             Done.Add(i);
                 return Done.Count == Actions.Length;
             }, Node =>
             {
                 Done = new List<int>();
+                LastStep = 0;
                 for (int i = 0; i < Actions.Length; i++)
                     Actions[i].Reset(Node);
             });
@@ -298,6 +358,24 @@ namespace Juixel.Drawing.Actions
         public static JAction ScaleTo(double To, double Duration, StepType Type = StepType.Linear)
         {
             return Group(ScaleToX(To, Duration), ScaleToY(To, Duration));
+        }
+
+        #endregion
+
+        #region Entrance Actions
+
+        public static JAction FadeInFromAngle(Angle Angle, double Distance, double Duration, StepType Type = StepType.Linear)
+        {
+            return Group(FadeIn(Duration, Type), new JAction((Node, Step) =>
+            {
+                Node.Position += Angle.Location * Distance;
+                return true;
+            }), MoveBy((Angle + 180).Location * Distance, Duration, Type));
+        }
+
+        public static JAction FadeOutToAngle(Angle Angle, double Distance, double Duration, StepType Type = StepType.Linear)
+        {
+            return Group(FadeOut(Duration, Type), MoveBy(Angle.Location * Distance, Duration, Type));
         }
 
         #endregion

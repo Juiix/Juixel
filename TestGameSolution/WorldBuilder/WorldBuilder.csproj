@@ -39,11 +39,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Game1.cs" />
-    <Compile Include="LoadingScene.cs" />
+    <Compile Include="CreationScene.cs" />
+    <Compile Include="LoadScene.cs" />
+    <Compile Include="SelectionScene.cs" />
     <Compile Include="MapScene.cs" />
     <Compile Include="Map\Chunk.cs" />
     <Compile Include="Map\Definitions.Map.cs" />
     <Compile Include="Map\Map.cs" />
+    <Compile Include="Map\Selection.cs" />
     <Compile Include="Map\Tile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -57,6 +60,7 @@
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

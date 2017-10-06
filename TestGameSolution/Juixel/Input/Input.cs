@@ -64,6 +64,12 @@ namespace Juixel.Interaction
                         MouseHandlers[i].MouseDown(0, NewMousePosition);
                 }
 
+                if (_LastMouseState.RightButton == ButtonState.Pressed && NewMouseState.RightButton == ButtonState.Released)
+                {
+                    for (int i = 0; i < MouseHandlers.Length; i++)
+                        MouseHandlers[i].MouseAltUp(0, NewMousePosition);
+                }
+
                 if (NewMousePosition != LastMousePosition)
                 {
                     JuixelGame.Shared.CurrentScene.OnSelectMoved(0, NewMousePosition);
@@ -76,6 +82,12 @@ namespace Juixel.Interaction
                     JuixelGame.Shared.CurrentScene.OnSelectUp(0, NewMousePosition);
                     for (int i = 0; i < MouseHandlers.Length; i++)
                         MouseHandlers[i].MouseUp(0, NewMousePosition);
+                }
+
+                if (_LastMouseState.RightButton == ButtonState.Released && NewMouseState.RightButton == ButtonState.Pressed)
+                {
+                    for (int i = 0; i < MouseHandlers.Length; i++)
+                        MouseHandlers[i].MouseAltDown(0, NewMousePosition);
                 }
 
                 if (_LastMouseState.ScrollWheelValue != NewMouseState.ScrollWheelValue)

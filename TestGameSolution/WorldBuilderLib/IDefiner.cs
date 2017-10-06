@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorldBuilder
+namespace WorldBuilderLib
 {
-    public enum MapAction
+    public interface IDefiner
     {
-        Move,
-        Draw,
-        Random
+        TileData[] GetTileDefintions();
     }
 }

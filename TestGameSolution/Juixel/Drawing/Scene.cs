@@ -105,7 +105,9 @@ namespace Juixel.Drawing
 
         public override void OnSelectDown(int Id, Location Location)
         {
-            Node N = InteractiveAtLocation(Location);
+            Node N = UI.InteractiveAtLocation(Location);
+            if (N == null)
+                N = InteractiveAtLocation(Location);
             if (N != null)
             {
                 CurrentInterations[Id] = N;
@@ -120,7 +122,9 @@ namespace Juixel.Drawing
                 CurrentInterations[Id].OnSelectMoved(Id, Location);
             else
             {
-                Node N = InteractiveAtLocation(Location);
+                Node N = UI.InteractiveAtLocation(Location);
+                if (N == null)
+                    N = InteractiveAtLocation(Location);
                 if (N != CurrentHover)
                 {
                     if (CurrentHover != null)

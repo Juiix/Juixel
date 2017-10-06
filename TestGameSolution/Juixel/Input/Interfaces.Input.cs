@@ -19,6 +19,8 @@ namespace Juixel.Interaction
         void MouseDown(int Id, Location Location);
         void MouseMoved(int Id, Location Location);
         void MouseUp(int Id, Location Location);
+        void MouseAltDown(int Id, Location Location);
+        void MouseAltUp(int Id, Location Location);
         void MouseScroll(int Amount);
     }
 }

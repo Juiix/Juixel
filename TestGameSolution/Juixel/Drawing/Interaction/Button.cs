@@ -7,6 +7,7 @@ using Juixel.Drawing.Textures;
 using Utilities;
 using Utilities.Logging;
 using Microsoft.Xna.Framework;
+using System.Windows.Forms;
 
 namespace Juixel.Drawing.Interaction
 {
@@ -17,6 +18,19 @@ namespace Juixel.Drawing.Interaction
         private LabelNode Label;
 
         private bool Selected = false;
+        
+        public string Title
+        {
+            get => Label.Text;
+            set
+            {
+                Label.Text = value;
+                Location LabelSize = Label.Size;
+                SpriteNode.Size = new Location(LabelSize.X + 40, LabelSize.Y + 34);
+            }
+        }
+
+        public override Location Size { get => SpriteNode.Size; set { } }
 
         public Button(Sprite Sprite, string Title, double Height, Action OnSelect)
         {
@@ -41,6 +55,13 @@ namespace Juixel.Drawing.Interaction
                 if (!Selected)
                     SpriteNode.Color = Color.LightGray;
             };
+            if (JuixelGame.DeviceType == DeviceType.PC)
+            {
+                SpriteNode.HoverMoved += (Node) =>
+                {
+                    Cursor.Current = Cursors.Hand;
+                };
+            }
             SpriteNode.HoverOut += (Node) =>
             {
                 if (!Selected)
@@ -54,8 +75,7 @@ namespace Juixel.Drawing.Interaction
             AddChild(Label);
 
             Location LabelSize = Label.Size;
-            SpriteNode.Size = new Location(LabelSize.X + 80, LabelSize.Y + 40);
-            Logger.Log(SpriteNode.Scale);
+            SpriteNode.Size = new Location(LabelSize.X + 40, LabelSize.Y + 34);
         }
     }
 }

@@ -14,9 +14,33 @@ namespace Juixel.Tools
 
         public static DispatchQueue Main = new DispatchQueue();
 
+        public static DispatchQueue IO;
+
         public static void DispatchMain(Action Block)
         {
             Main.Dispatch(Block);
+        }
+
+        public static void DispatchIO(Action Block)
+        {
+            if (IO == null)
+            {
+                IO = new DispatchQueue();
+                StartIOQueue();
+            }
+            IO.Dispatch(Block);
+        }
+
+        private static async void StartIOQueue()
+        {
+            while (true)
+            {
+                await Task.Delay(100);
+                if (IO != null)
+                    IO.Step();
+                else
+                    return;
+            }
         }
 
         public static void DispatchBackground(Action Action)

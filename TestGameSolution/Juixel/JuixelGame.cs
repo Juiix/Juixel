@@ -60,6 +60,8 @@ namespace Juixel
         public ContentManager Content => _Game.Content;
         public GraphicsDevice GraphicsDevice => _Game.GraphicsDevice;
 
+        public virtual string DataSavePath => "JuixelGame\\Data\\";
+
         /// <summary>
         /// Set this to change Mouse visibility. <see langword="False"/> is invisible
         /// </summary>
@@ -150,10 +152,12 @@ namespace Juixel
             WindowHeight = Graphics.PreferredBackBufferHeight;
 
             Graphics.PreferMultiSampling = false;
+            GameSettings.Load(DataSavePath);
 
             Logger.SaveLogs = false;
-
             Shared = this;
+
+            _Game.Exiting += OnExit;
         }
 
         protected virtual Scene MakeFirstScene()
@@ -164,6 +168,15 @@ namespace Juixel
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Called when the application is exiting
+        /// </summary>
+        protected virtual void OnExit(object Sender, EventArgs Args)
+        {
+            GameSettings.flush();
+            DispatchQueue.IO = null;
+        }
 
         /// <summary>
         /// Changes the Window size. Should be used for <see cref="DeviceType.PC"/> and <see cref="DeviceType.Mac"/>
@@ -189,8 +202,11 @@ namespace Juixel
 
         public void ChangeScene(Scene To)
         {
-            CurrentScene.Dispose();
-            CurrentScene = To;
+            DispatchQueue.DispatchMain(() =>
+            {
+                CurrentScene.Dispose();
+                CurrentScene = To;
+            });
         }
 
         private JuixelTime Time = new JuixelTime();
@@ -225,11 +241,13 @@ namespace Juixel
         {
             GraphicsDevice.Clear(BackgroundColor);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+            SpriteBatch.Tag = new DrawInfo { SortMode = SpriteSortMode.Deferred, Sampler = SamplerState.PointClamp, Blend = BlendState.AlphaBlend };
             CurrentScene.Draw(this.Time, SpriteBatch);
 
             if (TintColor != Color.White && TintIntensity > 0)
                 SpriteBatch.Draw(TextureLibrary.Square, new Rectangle(0, 0, WindowWidth, WindowHeight), TintColor * TintIntensity);
 
+#if DEBUG
             if (DebugFont != null)
             {
                 string Text = "FPS: " + GetFPS(Time);
@@ -244,6 +262,7 @@ namespace Juixel
                 SpriteBatch.Draw(TextureLibrary.Square, new Rectangle(0, 0, (int)Size.X + 8, (int)Size.Y), Color.Black * 0.5f);
                 SpriteBatch.DrawString(Info.BMFont, Text, new Vector2(4, 0), Color.White);
             }
+#endif
 
             SpriteBatch.End();
         }
@@ -265,6 +284,13 @@ namespace Juixel
             return (int)((Total / _FPSList.Count + 0.005) * 100) / 100.0;
         }
 
-        #endregion
+#endregion
+    }
+
+    public class DrawInfo
+    {
+        public SpriteSortMode SortMode;
+        public SamplerState Sampler;
+        public BlendState Blend;
     }
 }

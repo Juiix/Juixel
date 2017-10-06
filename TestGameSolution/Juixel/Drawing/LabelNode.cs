@@ -37,6 +37,8 @@ namespace Juixel.Drawing
         /// </summary>
         private Font Font;
 
+        public override SamplerState UsedSampler => SamplerState.LinearClamp;
+
         public override Location Size { get { return Font.MeasureString(Text, _TextHeight * Scale.X); } set { } }
 
         #endregion
@@ -75,13 +77,17 @@ namespace Juixel.Drawing
 
         public override void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)
         {
-            Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale);
-            Scale *= this.Scale;
-            FontInfo Info = Font.GetSized(_TextHeight * Scale.X);
-            Vector2 NormSize = Info.BMFont.MeasureString(Text);
-            SpriteBatch.DrawString(Info.BMFont, Text, DrawPosition.ToVector2(), Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
-                new Vector2(NormSize.X * (float)AnchorPoint.X, NormSize.Y * (float)AnchorPoint.Y), (float)(Scale * this.Scale * (_TextHeight / Info.Height)).X, SpriteEffects.None, 0);
-            base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
+            if (!Hidden)
+            {
+                CheckSamplerState(SpriteBatch);
+                Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale);
+                var UseScale = Scale * this.Scale;
+                FontInfo Info = Font.GetSized(_TextHeight * UseScale.X);
+                Vector2 NormSize = Info.BMFont.MeasureString(Text);
+                SpriteBatch.DrawString(Info.BMFont, Text, DrawPosition.ToVector2(), Color * (Alpha * this.Alpha), (float)(Rotation.Radians + this.Rotation.Radians),
+                    new Vector2(NormSize.X * (float)AnchorPoint.X, NormSize.Y * (float)AnchorPoint.Y), (float)(UseScale * (_TextHeight / Info.Height)).X, SpriteEffects.None, 0);
+                base.Draw(Time, SpriteBatch, Position, Rotation, Scale, Alpha);
+            }
         }
 
         #endregion

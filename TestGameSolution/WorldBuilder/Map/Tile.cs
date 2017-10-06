@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities.Tools;
+using WorldBuilderLib;
 
 namespace WorldBuilder
 {
@@ -18,8 +19,8 @@ namespace WorldBuilder
         {
             if (TextureData == null)
             {
-                TextureData = new Color[WBGame.TestTileSprites.Width * WBGame.TestTileSprites.Height];
-                WBGame.TestTileSprites.GetData(TextureData);
+                TextureData = new Color[WBGame.TileSheet.Width * WBGame.TileSheet.Height];
+                WBGame.TileSheet.GetData(TextureData);
             }
             if (!MainColors.ContainsKey(Index))
             {
@@ -28,7 +29,7 @@ namespace WorldBuilder
                 for (int y = Source.Y; y < Source.Y + Source.Height; y++)
                     for (int x = Source.X; x < Source.X + Source.Width; x++)
                     {
-                        Color = TextureData[y * WBGame.TestTileSprites.Width + x];
+                        Color = TextureData[y * WBGame.TileSheet.Width + x];
                         Count++;
                         RCount += Color.R;
                         GCount += Color.G;
@@ -43,10 +44,12 @@ namespace WorldBuilder
         public ushort Type;
         public Color MainColor;
 
-        public Tile(ushort Type)
+        public Tile(TileData Data)
         {
-            Sprite = new Sprite(WBGame.TestTileSprites, new Rectangle(Type % 8 * 32 + JRandom.Next(4) * 8, Type / 32 * 8, 8, 8));
-            this.Type = Type;
+            int Index = Data.Indexes[JRandom.Next(Data.Indexes.Length)];
+            int XLength = WBGame.TileSheet.Width / 8;
+            Sprite = new Sprite(WBGame.TileSheet, new Rectangle(Index % XLength * 8, Index / XLength * 8, 8, 8));
+            Type = Data.Type;
             MainColor = GetMainColor(Type, Sprite.Source);
         }
     }

@@ -8,7 +8,7 @@ namespace WorldBuilderLib
 {
     public interface IExporter
     {
-        void ProcessTile(uint X, uint Y, ushort Type);
+        void ProcessTile(uint X, uint Y, ushort Type, int BlockId);
 
         string GetFileExtension();
 

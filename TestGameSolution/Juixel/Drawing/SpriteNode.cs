@@ -77,10 +77,11 @@ namespace Juixel.Drawing
         {
             if (!Hidden)
             {
+                CheckSamplerState(SpriteBatch);
                 Location DrawPosition = Position + Geometry.RotateAroundOrigin(Rotation, this.Position * Scale) - new Location(0, Height * Scale.Y);
                 if (SnapToPixel) DrawPosition = DrawPosition.Round();
                 Location Size = this.Size * Scale;
-                Scale *= this.Scale;
+                var UseScale = Scale * this.Scale;
                 Color Color = this.Color * (Alpha * this.Alpha);
                 Rotation += this.Rotation;
                 float Radians = (float)Rotation.Radians;
@@ -89,10 +90,10 @@ namespace Juixel.Drawing
                 {
                     if (!CenterRect.HasValue)
                         SpriteBatch.Draw(Sprite.Texture, DrawPosition.ToVector2(), Sprite.Source, Color, (float)(Rotation.Radians + this.Rotation.Radians),
-                            new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), Scale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+                            new Vector2(Sprite.Source.Width * (float)AnchorPoint.X, Sprite.Source.Height * (float)AnchorPoint.Y), UseScale.ToVector2(), Reversed ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
                     else
                     {
-                        DrawPosition -= Size * AnchorPoint;
+                        DrawPosition -= Geometry.RotateAroundOrigin(Rotation, Size * AnchorPoint);
                         Rectangle ScaleRect = CenterRect.Value;
 
                         Vector2 centerScale = new Vector2((float)(Size.X - ScaleRect.X * 2) / ScaleRect.Width, (float)(Size.Y - ScaleRect.Y * 2) / ScaleRect.Height);

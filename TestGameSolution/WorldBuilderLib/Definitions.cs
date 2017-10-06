@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorldBuilder
+namespace WorldBuilderLib
 {
-    public enum MapAction
+    public struct TileData
     {
-        Move,
-        Draw,
-        Random
+        public ushort Type;
+        public int[] Indexes;
     }
 }

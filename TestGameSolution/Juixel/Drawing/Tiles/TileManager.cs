@@ -100,35 +100,40 @@ namespace Juixel.Drawing.Tiles
 
         public override void Draw(JuixelTime Time, SpriteBatch SpriteBatch, Location Position, Angle Rotation, Location Scale, float Alpha)
         {
-            Location BaseLocation = Position + this.Position;
-            Location BaseScale = Scale * this.Scale;
-            float BaseAlpha = Alpha * this.Alpha;
+            if (!Hidden)
+            {
+                CheckSamplerState(SpriteBatch);
 
-            for (int Y = Focus.Y - ViewRadius.Y; Y < Focus.Y + ViewRadius.Y; Y++)
-                for (int X = Focus.X - ViewRadius.X; X < Focus.X + ViewRadius.X; X++)
-                    if (X >= 0 && Y >= 0 && X < Width && Y < Height)
-                    {
-                        Tile Tile = Tiles[X, Y];
-                        if (Tile != null)
-                            Tile.Draw(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseScale, BaseAlpha);
-                    }
+                Location BaseLocation = Position + this.Position;
+                Location BaseScale = Scale * this.Scale;
+                float BaseAlpha = Alpha * this.Alpha;
 
-            // Draw blend
+                for (int Y = Focus.Y - ViewRadius.Y; Y < Focus.Y + ViewRadius.Y; Y++)
+                    for (int X = Focus.X - ViewRadius.X; X < Focus.X + ViewRadius.X; X++)
+                        if (X >= 0 && Y >= 0 && X < Width && Y < Height)
+                        {
+                            Tile Tile = Tiles[X, Y];
+                            if (Tile != null)
+                                Tile.Draw(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseScale, BaseAlpha);
+                        }
 
-            SpriteBatch.End();
-            SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, effect: Effects.TileBlendEffect);
+                // Draw blend
 
-            for (int Y = Focus.Y - ViewRadius.Y; Y < Focus.Y + ViewRadius.Y; Y++)
-                for (int X = Focus.X - ViewRadius.X; X < Focus.X + ViewRadius.X; X++)
-                    if (X >= 0 && Y >= 0 && X < Width && Y < Height)
-                    {
-                        Tile Tile = Tiles[X, Y];
-                        if (Tile != null)
-                            Tile.DrawBlend(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseScale, BaseAlpha);
-                    }
+                SpriteBatch.End();
+                SpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, effect: Effects.TileBlendEffect);
 
-            SpriteBatch.End();
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+                for (int Y = Focus.Y - ViewRadius.Y; Y < Focus.Y + ViewRadius.Y; Y++)
+                    for (int X = Focus.X - ViewRadius.X; X < Focus.X + ViewRadius.X; X++)
+                        if (X >= 0 && Y >= 0 && X < Width && Y < Height)
+                        {
+                            Tile Tile = Tiles[X, Y];
+                            if (Tile != null)
+                                Tile.DrawBlend(Texture, Time, SpriteBatch, BaseLocation + new Location(X * TileSize * BaseScale.X, Y * TileSize * BaseScale.Y), BaseScale, BaseAlpha);
+                        }
+
+                SpriteBatch.End();
+                SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+            }
         }
 
         public static IntLocation TileDirectionToPoint(TileDirection Direction)

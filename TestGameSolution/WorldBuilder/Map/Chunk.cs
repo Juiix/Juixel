@@ -24,31 +24,36 @@ namespace WorldBuilder
 
         public IntLocation Location;
 
-        private Tile[,] Tiles;
+        private Tile?[,] Tiles;
+        public int[,] RTicks;
 
         private int TileCount;
 
-        public Chunk(int Size, IntLocation Location, ushort FillType)
+        public Chunk(int Size, IntLocation Location)
         {
             this.Location = Location;
             Texture = new Texture2D(JuixelGame.Shared.GraphicsDevice, Size, Size);
             TextureData = new Color[Size * Size];
 
             TileCount = Size;
-            Tiles = new Tile[TileCount, TileCount];
-            for (int y = 0; y < TileCount; y++)
-                for (int x = 0; x < TileCount; x++)
-                {
-                    Tile Tile = new Tile(FillType);
-                    Tiles[x, y] = Tile;
-                    TextureData[y * Size + x] = Tile.MainColor;
-                }
+            Tiles = new Tile?[TileCount, TileCount];
+            RTicks = new int[TileCount, TileCount];
 
             Texture.SetData(TextureData);
         }
 
-        public void Set(int X, int Y, Tile Tile)
+        public override void Dispose()
         {
+            base.Dispose();
+
+            Texture.Dispose();
+        }
+
+        public Tile? Get(int X, int Y) => Tiles[X, Y];
+
+        public void Set(int X, int Y, Tile Tile, int Tick)
+        {
+            RTicks[X, Y] = Tick;
             Tiles[X, Y] = Tile;
             TextureData[Y * TileCount + X] = Tile.MainColor;
         }
@@ -73,8 +78,12 @@ namespace WorldBuilder
                 for (int y = 0; y < TileCount; y++)
                     for (int x = 0; x < TileCount; x++)
                     {
-                        var Tile = Tiles[x, y];
-                        SpriteBatch.Draw(Tile.Sprite.Texture, new Location(Position.X + x * Scale.X, Position.Y + y * Scale.Y).ToVector2(), Tile.Sprite.Source, Color, 0, Vector2.Zero, (Scale / 8).ToVector2(), SpriteEffects.None, 0);
+                        var NTile = Tiles[x, y];
+                        if (NTile != null)
+                        {
+                            var Tile = NTile.Value;
+                            SpriteBatch.Draw(Tile.Sprite.Texture, new Location(Position.X + x * Scale.X, Position.Y + y * Scale.Y).ToVector2(), Tile.Sprite.Source, Color, 0, Vector2.Zero, (Scale / 8).ToVector2(), SpriteEffects.None, 0);
+                        }
                     }
             }
         }

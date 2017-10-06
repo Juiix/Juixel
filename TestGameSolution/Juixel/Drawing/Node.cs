@@ -38,6 +38,11 @@ namespace Juixel.Drawing
             }
         }
 
+        /// <summary>
+        /// The sampler used to draw this <see cref="Node"/>
+        /// </summary>
+        public virtual SamplerState UsedSampler => SamplerState.PointClamp;
+
         public Location SceneLocation
         {
             get
@@ -45,7 +50,7 @@ namespace Juixel.Drawing
                 if (Parent != null)
                     return Position * Parent.Scale + Parent.SceneLocation;
                 else
-                    return Location.Zero;
+                    return Position;
             }
         }
 
@@ -202,7 +207,7 @@ namespace Juixel.Drawing
         public virtual void Dispose()
         {
             RemoveFromParent();
-            RemoveAllChildren();
+            RemoveAllChildren(true);
             RemoveAllActions();
 
             /*Alpha = 1;
@@ -288,11 +293,15 @@ namespace Juixel.Drawing
         /// <summary>
         /// Removes all children of this <see cref="Node"/>
         /// </summary>
-        public void RemoveAllChildren()
+        public void RemoveAllChildren(bool Dispose = false)
         {
             Node[] Cs = Children.ToArray();
             for (int i = 0; i < Cs.Length; i++)
+            {
                 RemoveChild(Cs[i]);
+                if (Dispose)
+                    Cs[i].Dispose();
+            }
         }
 
         /// <summary>
@@ -346,6 +355,16 @@ namespace Juixel.Drawing
             Children.Sort((A, B) => A.Layer == B.Layer ? A.AddOrder.CompareTo(B.AddOrder) : A.Layer.CompareTo(B.Layer));
         }
 
+        public List<Node> ChildrenWhere(Func<Node, bool> Selector)
+        {
+            List<Node> Selected = new List<Node>();
+            if (Selector(this))
+                Selected.Add(this);
+            for (int i = 0; i < Children.Count; i++)
+                Selected.AddRange(Children[i].ChildrenWhere(Selector));
+            return Selected;
+        }
+
         #endregion
 
         #region Drawing
@@ -362,6 +381,17 @@ namespace Juixel.Drawing
 
                 for (int i = 0; i < Children.Count; i++)
                     Children[i].Draw(Time, SpriteBatch, Position + this.Position, Rotation + this.Rotation, Scale * this.Scale, Alpha * this.Alpha);
+            }
+        }
+
+        protected void CheckSamplerState(SpriteBatch SpriteBatch)
+        {
+            DrawInfo Info = (DrawInfo)SpriteBatch.Tag;
+            if (Info.Sampler != UsedSampler)
+            {
+                SpriteBatch.End();
+                Info.Sampler = UsedSampler;
+                SpriteBatch.Begin(Info.SortMode, Info.Blend, Info.Sampler);
             }
         }
 
@@ -458,7 +488,7 @@ namespace Juixel.Drawing
                 var Actions = this.Actions.ToArray();
                 foreach (var Action in Actions)
                     if (Action.Value.Run(this, Time.ElapsedSec))
-                        this.Actions.Remove(Action.Key);
+                        RemoveAction(Action.Key);
             }
         }
 
@@ -471,7 +501,9 @@ namespace Juixel.Drawing
         public void RunAction(string Key, JAction Action)
         {
             if (Actions.Count == 0 && Scene != null && !Updates)
+            {
                 Scene.AddUpdatable(this);
+            }
             Actions[Key] = Action;
         }
 

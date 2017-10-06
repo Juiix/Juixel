@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{620E677F-F61A-4E9E-A041-F4C5A501DB96}</ProjectGuid>
+    <ProjectGuid>{01E7CC4C-2420-4F48-A26F-C10641664262}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WorldBuilderLib</RootNamespace>
-    <AssemblyName>WorldBuilderLib</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>WorldBuilderDarza</RootNamespace>
+    <AssemblyName>WorldBuilderDarza</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DarzasUtilities">
+      <HintPath>..\..\..\DarzasDominion\DarzasDominionServer\DarzasUtilities\bin\Debug\DarzasUtilities.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,18 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Definitions.cs" />
-    <Compile Include="IDefiner.cs" />
-    <Compile Include="IExporter.cs" />
-    <Compile Include="IImporter.cs" />
-    <Compile Include="IO\MapDescriptorFile.cs" />
-    <Compile Include="MapDataLoader.cs" />
+    <Compile Include="DarzasDefiner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utilities\Utilities.csproj">
-      <Project>{11c85470-e0e8-4b3f-8b76-8b1ed320bae2}</Project>
-      <Name>Utilities</Name>
+    <ProjectReference Include="..\Juixel\Juixel.csproj">
+      <Project>{a0fd446c-4455-49b0-871b-bb35b575ed85}</Project>
+      <Name>Juixel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorldBuilderLib\WorldBuilderLib.csproj">
+      <Project>{620e677f-f61a-4e9e-a041-f4c5a501db96}</Project>
+      <Name>WorldBuilderLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
